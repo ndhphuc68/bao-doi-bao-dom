@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     }
   },
   modules: ['@primevue/nuxt-module', '@vite-pwa/nuxt', '@nuxtjs/tailwindcss', '@nuxt/icon', '@pinia/nuxt'],
-  css: ['~/assets/css/main.css'],
+  css: ['leaflet/dist/leaflet.css', '~/assets/css/main.css'],
   devServer: {
     host: process.env.NUXT_HOST || process.env.HOST || '127.0.0.1',
     port: Number(process.env.NUXT_PORT || process.env.PORT) || 3000
@@ -37,6 +37,9 @@ export default defineNuxtConfig({
     }
   },
   pwa: {
+    strategies: 'injectManifest',
+    srcDir: '.',
+    filename: 'sw.ts',
     registerType: 'autoUpdate',
     manifest: {
       name: 'Eco — Tái chế điện tử',
@@ -51,13 +54,14 @@ export default defineNuxtConfig({
       lang: 'vi',
       categories: ['utilities', 'lifestyle']
     },
-    workbox: {
-      navigateFallback: '/',
+    injectManifest: {
+      rollupFormat: 'iife',
       globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
     },
     devOptions: {
       enabled: true,
-      suppressWarnings: true
+      suppressWarnings: true,
+      type: 'module'
     }
   },
   app: {

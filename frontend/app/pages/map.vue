@@ -3,11 +3,35 @@ definePageMeta({ middleware: ['require-auth'] })
 </script>
 
 <template>
-  <div class="flex min-h-[100dvh] flex-col items-center justify-center px-6 pb-28 pt-8 text-center">
-    <i class="pi pi-map-marker mb-4 text-5xl text-emerald-500" />
-    <h1 class="mb-2 text-lg font-bold text-slate-900">Bản đồ</h1>
-    <p class="mb-6 text-sm text-slate-600">Tính năng đang được hoàn thiện. Bạn có thể tìm điểm thu gom trong luồng hoàn trả.</p>
-    <Button label="Đi tới điểm thu gom" rounded @click="navigateTo('/recycle/step-4')" />
+  <div class="min-h-[100dvh] pb-28">
+    <AppPageHeader title="Bản đồ" />
+
+    <div class="px-3 pt-3">
+      <div class="mb-2 flex items-center justify-between gap-2">
+        <p class="text-xs font-medium text-slate-600">
+          OpenStreetMap (miễn phí) • Leaflet
+        </p>
+        <Button
+          label="Đi tới điểm thu gom"
+          size="small"
+          rounded
+          severity="secondary"
+          @click="navigateTo('/recycle/step-4')"
+        />
+      </div>
+
+      <div class="h-[calc(100dvh-11.5rem)]">
+        <ClientOnly>
+          <LeafletMap />
+          <template #fallback>
+            <div class="flex h-full items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-sm text-slate-500">
+              Đang tải bản đồ…
+            </div>
+          </template>
+        </ClientOnly>
+      </div>
+    </div>
+
     <AppBottomNav />
   </div>
 </template>

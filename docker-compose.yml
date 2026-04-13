@@ -17,7 +17,7 @@ services:
     environment:
       DATABASE_URL: postgresql://root:root@db:5432/appdb?schema=public
       # Trình duyệt gọi API từ http://localhost:3000 — phải khớp CORS
-      FRONTEND_ORIGIN: http://localhost:3000,http://127.0.0.1:3000
+      FRONTEND_ORIGIN: http://localhost:3000,http://127.0.0.1:3000,http://${LOCAL_IP:-192.168.1.211}:3000
       # Bind mount (đặc biệt Windows/macOS): bắt buộc polling để file đổi là Nest restart
       CHOKIDAR_USEPOLLING: "true"
       CHOKIDAR_INTERVAL: "1000"
@@ -34,7 +34,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     environment:
-      NUXT_PUBLIC_API_BASE: http://localhost:3001
+      NUXT_PUBLIC_API_BASE: http://${LOCAL_IP:-192.168.1.211}:3001
       NUXT_HOST: 0.0.0.0
       HOST: 0.0.0.0
       PORT: "3000"

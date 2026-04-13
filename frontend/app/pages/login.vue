@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import { getApiErrorMessage, isEmailAlreadyRegistered } from '~/utils/api/errors'
+import { useToast } from 'primevue/usetoast'
+import { getApiErrorMessage } from '~/utils/api/errors'
 
 definePageMeta({
   middleware: ['require-onboarding']
@@ -10,26 +11,18 @@ const email = ref('demo@gmail.com')
 const password = ref('password123')
 const router = useRouter()
 const { auth } = useApi()
+const toast = useToast()
 
 const handleLogin = async () => {
   try {
-    let res
-    try {
-      res = await auth.register({ email: email.value, password: password.value })
-    } catch (e) {
-      if (isEmailAlreadyRegistered(e)) {
-        res = await auth.login({ email: email.value, password: password.value })
-      } else {
-        throw e
-      }
-    }
+    const res = await auth.login({ email: email.value, password: password.value })
 
     const token = useCookie('auth_token')
     token.value = res.access_token
-    alert('Đăng nhập thành công!')
+    toast.add({ severity: 'success', summary: 'Thành công', detail: 'Đăng nhập thành công!', life: 2500 })
     router.push('/home')
   } catch (err) {
-    alert(getApiErrorMessage(err))
+    toast.add({ severity: 'error', summary: 'Đăng nhập thất bại', detail: getApiErrorMessage(err), life: 3500 })
   }
 }
 </script>
@@ -91,7 +84,7 @@ const handleLogin = async () => {
 
         <p class="text-center text-sm text-slate-600">
           Chưa có tài khoản?
-          <span class="ml-1 font-semibold text-emerald-600">Đăng ký ngay</span>
+          <NuxtLink to="/register" class="ml-1 font-semibold text-emerald-600 hover:underline">Đăng ký ngay</NuxtLink>
         </p>
 
         <Divider align="center" type="solid">
