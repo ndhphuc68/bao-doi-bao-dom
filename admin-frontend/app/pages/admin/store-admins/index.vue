@@ -16,8 +16,6 @@ type StoreAdmin = {
   collectionPoint?: { id: string; name: string } | null
 }
 
-type CollectionPoint = { id: string; name: string; address: string }
-
 const token = useCookie('admin_auth_token')
 const toast = useToast()
 const { apiFetch } = useApi()
@@ -25,8 +23,7 @@ const { apiFetch } = useApi()
 const form = reactive({
   email: '',
   password: '',
-  name: '',
-  collectionPointId: ''
+  name: ''
 })
 
 const {
@@ -39,10 +36,6 @@ const {
   })
 )
 
-const { data: points } = await useAsyncData('cps', () =>
-  apiFetch<CollectionPoint[]>('/collection-points')
-)
-
 const submit = async () => {
   try {
     await apiFetch('/admin/store-admins', {
@@ -51,15 +44,13 @@ const submit = async () => {
       body: {
         email: form.email,
         password: form.password,
-        name: form.name || form.email.split('@')[0],
-        collectionPointId: form.collectionPointId
+        name: form.name || form.email.split('@')[0]
       }
     })
     toast.add({ severity: 'success', summary: 'Đã tạo', detail: 'Tài khoản admin cửa hàng đã được thêm.', life: 2500 })
     form.email = ''
     form.password = ''
     form.name = ''
-    form.collectionPointId = ''
     await refresh()
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Lỗi', detail: getApiErrorMessage(e), life: 4000 })
@@ -71,7 +62,7 @@ const submit = async () => {
   <div class="flex flex-col gap-6">
     <div>
       <h1 class="text-xl font-bold tracking-tight">Quản lý admin cửa hàng</h1>
-      <p class="text-sm text-slate-600">Chỉ admin tổng tạo/sửa tài khoản gắn với một điểm thu gom.</p>
+      <p class="text-sm text-slate-600">Chỉ admin tổng tạo tài khoản admin cửa hàng.</p>
     </div>
 
     <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
@@ -92,21 +83,9 @@ const submit = async () => {
             placeholder="••••••••"
           />
         </div>
-        <div>
+        <div class="md:col-span-2">
           <label class="mb-1 block text-xs font-medium text-slate-600">Tên hiển thị</label>
           <InputText v-model="form.name" fluid class="rounded-xl" placeholder="Nguyễn Văn A" />
-        </div>
-        <div>
-          <label class="mb-1 block text-xs font-medium text-slate-600">Điểm thu gom</label>
-          <Dropdown
-            v-model="form.collectionPointId"
-            :options="points || []"
-            option-label="name"
-            option-value="id"
-            placeholder="Chọn cửa hàng"
-            fluid
-            class="!rounded-xl"
-          />
         </div>
       </div>
       <div class="mt-4 flex justify-end">

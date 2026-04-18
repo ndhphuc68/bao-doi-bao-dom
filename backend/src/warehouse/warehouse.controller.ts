@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminAccessGuard } from '../common/guards/admin-access.guard';
+import { resolveAdminListScope } from '../common/admin-scope.util';
 import type { AdminCreateWarehouseShipmentBody } from './warehouse.service';
 import { WarehouseService } from './warehouse.service';
 
@@ -42,12 +43,17 @@ export class WarehouseController {
   @Get('admin/warehouse')
   @UseGuards(AdminAccessGuard)
   adminList(
+    @Req() req: { user?: { role?: string; collectionPointId?: string | null } },
     @Query('q') q?: string,
     @Query('availableOnly') availableOnly?: string,
+    @Query('collectionPointId') collectionPointId?: string,
   ) {
+    const s = resolveAdminListScope(req, collectionPointId);
     return this.service.adminList({
       q,
       availableOnly: availableOnly === '1' || availableOnly === 'true',
+      collectionPointId: s.scopeAll ? undefined : s.collectionPointId,
+      scopeAll: s.scopeAll,
     });
   }
 

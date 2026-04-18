@@ -12,6 +12,10 @@ import {
   RequestStatus,
   ReturnFlowStatus,
 } from '../recycling-requests/recycling-request.entity';
+import { ORDER_APPROVAL_POINTS } from '../recycling-requests/recycling.constants';
+import { User } from '../users/user.entity';
+import { UserPointLedgerService } from '../users/user-point-ledger.service';
+import { PointLedgerReason } from '../users/user-point-ledger.entity';
 import { WarehouseItem } from '../warehouse/warehouse-item.entity';
 
 type CreateReturnRequestDto = {
@@ -81,6 +85,7 @@ export class ReturnRequestsService {
     private readonly recyclingRepo: Repository<RecyclingRequest>,
     @InjectRepository(WarehouseItem)
     private readonly warehouseRepo: Repository<WarehouseItem>,
+    private readonly pointLedgerService: UserPointLedgerService,
   ) {}
 
   async createForUser(userId: string, dto: CreateReturnRequestDto) {
@@ -218,6 +223,19 @@ export class ReturnRequestsService {
     }
 
     const saved = await this.recyclingRepo.manager.transaction(async (em) => {
+      if (dto.status === ReturnRequestStatus.APPROVED) {
+        if (!rr.approvalPointsAwarded && rr.userId) {
+          await em.increment(User, { id: rr.userId }, 'points', ORDER_APPROVAL_POINTS);
+          rr.approvalPointsAwarded = true;
+          await this.pointLedgerService.appendTransactional(em, {
+            userId: rr.userId,
+            amount: ORDER_APPROVAL_POINTS,
+            reason: PointLedgerReason.ORDER_APPROVED,
+            recyclingRequestId: rr.id,
+          });
+        }
+      }
+
       const savedRr = await em.save(rr);
 
       if (dto.status === ReturnRequestStatus.APPROVED) {

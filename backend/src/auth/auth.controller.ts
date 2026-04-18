@@ -25,4 +25,10 @@ export class AuthController {
   getProfile(@Req() req) {
     return this.authService.getProfileById(req.user.userId);
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('point-ledger')
+  getPointLedger(@Req() req) {
+    return this.authService.getPointLedgerSummary(req.user.userId);
+  }
 }

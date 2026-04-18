@@ -65,7 +65,7 @@ onMounted(() => {
 })
 
 function startRecycle() {
-  router.push('/recycle/step-1')
+  router.push('/recycle')
 }
 </script>
 

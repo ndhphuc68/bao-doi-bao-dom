@@ -13,7 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AdminAccessGuard } from '../common/guards/admin-access.guard';
 import { ReturnRequestsService } from './return-requests.service';
 import { ReturnRequestStatus } from './return-request.entity';
-import { resolveAdminScope } from '../common/admin-scope.util';
+import { resolveAdminListScope, resolveAdminScope } from '../common/admin-scope.util';
 
 @Controller()
 @UseGuards(AuthGuard('jwt'))
@@ -47,8 +47,9 @@ export class ReturnRequestsController {
     @Query('deviceType') deviceType?: string,
     /** Ngày tạo đơn (theo giờ Việt Nam), định dạng YYYY-MM-DD */
     @Query('date') date?: string,
+    @Query('collectionPointId') collectionPointId?: string,
   ) {
-    const s = resolveAdminScope(req);
+    const s = resolveAdminListScope(req, collectionPointId);
     return this.service.adminList({
       status,
       q,

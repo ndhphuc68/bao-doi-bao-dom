@@ -3,13 +3,15 @@ definePageMeta({ middleware: ['require-auth'] })
 
 const config = useRuntimeConfig()
 const token = useCookie('auth_token')
-const { data: profile } = await useFetch<{ name?: string; email?: string; role?: string }>(
-  '/auth/profile',
-  {
-    baseURL: config.public.apiBase as string,
-    headers: { Authorization: `Bearer ${token.value}` }
-  }
-)
+const { data: profile } = await useFetch<{
+  name?: string
+  email?: string
+  role?: string
+  points?: number
+}>('/auth/profile', {
+  baseURL: config.public.apiBase as string,
+  headers: { Authorization: `Bearer ${token.value}` }
+})
 
 type JwtPayload = Record<string, unknown>
 
@@ -94,6 +96,14 @@ function logout() {
         <p class="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-600">
           {{ displayRole }}
         </p>
+        <NuxtLink
+          to="/rewards"
+          class="mt-3 inline-flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200/80 transition hover:bg-emerald-100"
+        >
+          <i class="pi pi-star-fill text-amber-500" aria-hidden="true" />
+          <span>Điểm xanh: {{ profile?.points ?? '—' }}</span>
+          <i class="pi pi-angle-right text-emerald-600/80" aria-hidden="true" />
+        </NuxtLink>
       </div>
 
       <div class="mt-5 rounded-3xl bg-white p-2 shadow-[0_10px_30px_rgba(15,23,42,0.06)]">

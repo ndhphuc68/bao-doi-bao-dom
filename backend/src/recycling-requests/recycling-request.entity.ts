@@ -90,6 +90,10 @@ export class RecyclingRequest {
   @Column({ unique: true })
   trackingCode: string;
 
+  /** Tránh cộng điểm xác nhận đơn nhiều lần (nhiều luồng admin). */
+  @Column({ type: 'boolean', default: false })
+  approvalPointsAwarded: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 }

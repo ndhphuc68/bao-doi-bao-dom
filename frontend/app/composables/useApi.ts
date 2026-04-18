@@ -3,6 +3,7 @@ import type {
   AuthTokenResponse,
   CollectionPointDto,
   CreateRecyclingRequestBody,
+  PointLedgerSummary,
   RecyclingRequestCreated,
   UploadRecyclingImagesResponse,
   UserRecyclingOrder,
@@ -36,7 +37,11 @@ export function useApi() {
       register: (body: { email: string; password: string; name?: string }) =>
         apiFetch<AuthTokenResponse>('/auth/register', { method: 'POST', body }),
       login: (body: { email: string; password: string }) =>
-        apiFetch<AuthTokenResponse>('/auth/login', { method: 'POST', body })
+        apiFetch<AuthTokenResponse>('/auth/login', { method: 'POST', body }),
+      pointLedger: (token: string) =>
+        apiFetch<PointLedgerSummary>('/auth/point-ledger', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
     },
     collectionPoints: {
       list: () => apiFetch<CollectionPointDto[]>('/collection-points')

@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast'
 import { getApiErrorMessage } from '~/utils/api/errors'
+import { userOrderStatusLabel } from '~/utils/recycling-order-display'
 
 definePageMeta({ middleware: ['require-auth'] })
 
 const route = useRoute()
 const router = useRouter()
+
+const returnsListPath = computed(() =>
+  String(route.query.from || '') === 'recycle' ? '/recycle' : '/profile/returns'
+)
 const token = useCookie('auth_token')
 const toast = useToast()
 const mediaUrl = useMediaUrl()
@@ -30,26 +35,9 @@ const orderImages = computed(() => {
   return raw.map((s) => mediaUrl(s)).filter(Boolean)
 })
 
-function orderStatusLabel(st: string): string {
-  const m: Record<string, string> = {
-    PENDING: 'Chờ thu gom',
-    COMPLETED: 'Đã thu gom',
-    STORED: 'Đã nhập kho',
-    CANCELLED: 'Đã huỷ'
-  }
-  return m[st] ?? st
-}
-
-function returnStatusLabel(rs?: string | null): string {
-  if (!rs || rs === 'NONE') return '—'
-  const m: Record<string, string> = {
-    PENDING: 'Chờ kiểm hàng',
-    APPROVED: 'Đã nhập kho',
-    REJECTED: 'Từ chối',
-    CANCELLED: 'Đã huỷ yêu cầu'
-  }
-  return m[rs] ?? rs
-}
+const userStatusLine = computed(() =>
+  order.value ? userOrderStatusLabel(order.value.status, order.value.returnStatus) : ''
+)
 
 const canCancelReturn = computed(() => order.value?.returnStatus === 'PENDING')
 
@@ -72,7 +60,7 @@ async function cancelReturn() {
 
 <template>
   <div class="min-h-[100dvh] bg-slate-50 pb-28">
-    <AppPageHeader title="Chi tiết đơn" back-to="/profile/returns" />
+    <AppPageHeader title="Chi tiết đơn" :back-to="returnsListPath" />
 
     <div class="px-5 pt-4">
       <div v-if="pending" class="py-12 text-center text-sm text-slate-500">Đang tải…</div>
@@ -97,10 +85,8 @@ async function cancelReturn() {
         </div>
 
         <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500">Trạng thái đơn</p>
-          <p class="mt-1 font-semibold text-slate-900">{{ orderStatusLabel(order.status) }}</p>
-          <p class="mt-3 text-xs font-semibold text-slate-500">Xử lý tại điểm thu</p>
-          <p class="mt-1 font-semibold text-slate-900">{{ returnStatusLabel(order.returnStatus) }}</p>
+          <p class="text-xs font-semibold text-slate-500">Trạng thái</p>
+          <p class="mt-1 text-base font-semibold text-slate-900">{{ userStatusLine }}</p>
           <p v-if="order.returnReason?.trim()" class="mt-3 text-xs font-semibold text-slate-500">Ghi chú của bạn</p>
           <p v-if="order.returnReason?.trim()" class="mt-1 whitespace-pre-wrap text-sm text-slate-800">{{ order.returnReason }}</p>
           <p v-if="order.returnAdminNote?.trim()" class="mt-3 text-xs font-semibold text-slate-500">Phản hồi từ điểm thu</p>
@@ -133,7 +119,13 @@ async function cancelReturn() {
           @click="cancelReturn"
         />
 
-        <Button label="Quay lại danh sách" severity="secondary" outlined class="w-full !rounded-2xl" @click="router.push('/profile/returns')" />
+        <Button
+          label="Quay lại danh sách"
+          severity="secondary"
+          outlined
+          class="w-full !rounded-2xl"
+          @click="router.push(returnsListPath)"
+        />
       </div>
     </div>
   </div>

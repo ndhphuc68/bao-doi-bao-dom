@@ -18,7 +18,7 @@ const selectDevice = (id) => {
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col bg-white">
-    <AppPageHeader title="Thu gom thiết bị" back-to="/login" />
+    <AppPageHeader title="Thu gom thiết bị" back-to="/recycle" />
 
     <div class="flex-1 px-5 pb-6 pt-2 sm:px-8">
       <RecycleProgress :step="1" />

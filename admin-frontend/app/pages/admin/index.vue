@@ -61,15 +61,6 @@ function trendArrowClass(n: number | null) {
           Báo cáo &amp; thống kê đơn thu gom — 6 tháng gần nhất và phân loại theo nhóm thiết bị.
         </p>
       </div>
-      <Button
-        icon="pi pi-sliders-h"
-        label="Bộ lọc"
-        severity="secondary"
-        outlined
-        class="!rounded-2xl shrink-0"
-        disabled
-        title="Sắp có"
-      />
     </div>
 
     <div v-if="pending" class="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500">

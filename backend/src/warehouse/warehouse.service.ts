@@ -28,11 +28,24 @@ export class WarehouseService {
     private readonly shipmentItemRepo: Repository<WarehouseShipmentItem>,
   ) {}
 
-  async adminList(params: { q?: string; availableOnly?: boolean }) {
+  async adminList(params: {
+    q?: string;
+    availableOnly?: boolean;
+    collectionPointId?: string | null;
+    scopeAll?: boolean;
+  }) {
+    if (params.scopeAll === false && !params.collectionPointId) {
+      return [];
+    }
+
     const qb = this.repo
       .createQueryBuilder('w')
       .leftJoinAndSelect('w.recyclingRequest', 'rr')
       .orderBy('w.storedAt', 'DESC');
+
+    if (params.collectionPointId) {
+      qb.andWhere('rr.collectionPointId = :cpId', { cpId: params.collectionPointId });
+    }
 
     if (params.q) {
       const q = `%${params.q}%`;

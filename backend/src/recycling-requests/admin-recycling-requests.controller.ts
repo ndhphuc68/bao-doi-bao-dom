@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Get, Param, Patch, Query, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminAccessGuard } from '../common/guards/admin-access.guard';
-import { resolveAdminScope } from '../common/admin-scope.util';
+import { resolveAdminListScope, resolveAdminScope } from '../common/admin-scope.util';
 import { RecyclingRequestsService } from './recycling-requests.service';
 
 @Controller()
@@ -18,8 +18,9 @@ export class AdminRecyclingRequestsController {
     @Query('returnStatus') returnStatus?: string,
     /** Ngày tạo đơn (theo múi +07), YYYY-MM-DD */
     @Query('date') date?: string,
+    @Query('collectionPointId') collectionPointId?: string,
   ) {
-    const s = resolveAdminScope(req);
+    const s = resolveAdminListScope(req, collectionPointId);
     return this.service.adminList({
       q,
       status,

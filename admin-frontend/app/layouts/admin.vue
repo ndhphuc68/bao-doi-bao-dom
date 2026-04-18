@@ -6,6 +6,12 @@ const token = useCookie('admin_auth_token')
 const { public: pub } = useRuntimeConfig()
 const { apiFetch } = useApi()
 
+type CollectionPointDto = { id: string; name: string; address: string }
+
+const { data: collectionPoints } = await useAsyncData('admin_sidebar_collection_points', () =>
+  apiFetch<CollectionPointDto[]>('/collection-points')
+)
+
 function parseList(raw: string) {
   return String(raw || '')
     .split(',')
@@ -32,6 +38,14 @@ const canSuperAdmin = computed(() => {
   if (superEmails.value.length) return superEmails.value.includes(e)
   if (adminEmails.value.length) return adminEmails.value.includes(e)
   return false
+})
+
+const storeAdminPointLabel = computed(() => {
+  if (me.value?.role !== 'STORE_ADMIN') return ''
+  const id = me.value?.collectionPointId
+  if (!id) return 'Chưa gán điểm thu gom'
+  const p = collectionPoints.value?.find((c) => c.id === id)
+  return p?.name || id
 })
 
 const roleLabel = computed(() => {
@@ -72,6 +86,16 @@ const handleLogout = async () => {
             class="!rounded-xl"
             @click="handleLogout"
           />
+        </div>
+
+        <div
+          v-if="me?.role === 'STORE_ADMIN'"
+          class="mb-3 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3"
+        >
+          <div class="text-[11px] font-semibold uppercase tracking-wide text-emerald-800/90">
+            Điểm thu gom của bạn
+          </div>
+          <div class="mt-1 text-sm font-semibold text-emerald-950">{{ storeAdminPointLabel }}</div>
         </div>
 
         <nav class="flex flex-col gap-1">

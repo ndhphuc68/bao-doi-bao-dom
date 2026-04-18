@@ -2,7 +2,10 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { RecyclingRequest, RequestStatus, ReturnFlowStatus } from './recycling-request.entity';
-import { UsersService } from '../users/users.service';
+import { ORDER_APPROVAL_POINTS } from './recycling.constants';
+import { User } from '../users/user.entity';
+import { UserPointLedgerService } from '../users/user-point-ledger.service';
+import { PointLedgerReason } from '../users/user-point-ledger.entity';
 import type { AdminScope } from '../common/admin-scope.util';
 import { WarehouseItem } from '../warehouse/warehouse-item.entity';
 
@@ -58,7 +61,7 @@ export class RecyclingRequestsService {
     private requestsRepository: Repository<RecyclingRequest>,
     @InjectRepository(WarehouseItem)
     private warehouseRepo: Repository<WarehouseItem>,
-    private usersService: UsersService,
+    private pointLedgerService: UserPointLedgerService,
   ) {}
 
   async create(
@@ -79,7 +82,6 @@ export class RecyclingRequestsService {
       userId: userId,
       trackingCode: trackingCode,
     } as import('typeorm').DeepPartial<RecyclingRequest>);
-    await this.usersService.addPoints(userId, 100);
     return this.requestsRepository.save(newRequest as any);
   }
 
@@ -206,6 +208,17 @@ export class RecyclingRequestsService {
       if (body.decision === 'APPROVE') {
         row.status = RequestStatus.STORED;
         row.returnStatus = ReturnFlowStatus.APPROVED;
+
+        if (!row.approvalPointsAwarded && row.userId) {
+          await em.increment(User, { id: row.userId }, 'points', ORDER_APPROVAL_POINTS);
+          row.approvalPointsAwarded = true;
+          await this.pointLedgerService.appendTransactional(em, {
+            userId: row.userId,
+            amount: ORDER_APPROVAL_POINTS,
+            reason: PointLedgerReason.ORDER_APPROVED,
+            recyclingRequestId: row.id,
+          });
+        }
 
         const existed = await em.findOne(WarehouseItem, { where: { recyclingRequestId: row.id } });
         if (!existed) {

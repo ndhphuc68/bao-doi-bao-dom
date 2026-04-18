@@ -44,7 +44,7 @@ export class UsersService {
     email: string;
     password: string;
     name: string;
-    collectionPointId: string;
+    collectionPointId?: string | null;
   }): Promise<User> {
     const email = data.email.trim().toLowerCase();
     const existing = await this.findOneByEmail(email);
@@ -54,7 +54,7 @@ export class UsersService {
       email,
       password: hashed,
       name: data.name.trim(),
-      collectionPointId: data.collectionPointId,
+      collectionPointId: data.collectionPointId ?? null,
       role: UserRole.STORE_ADMIN,
       points: 0,
     });

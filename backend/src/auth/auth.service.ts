@@ -1,14 +1,19 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
+import { UserPointLedgerService } from '../users/user-point-ledger.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserRole } from '../users/user.entity';
+import { User, UserRole } from '../users/user.entity';
+import { PointLedgerReason } from '../users/user-point-ledger.entity';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private dataSource: DataSource,
+    private pointLedgerService: UserPointLedgerService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -47,14 +52,29 @@ export class AuthService {
         throw new UnauthorizedException('Email already exists. Try logging in.');
     }
     const hashedPassword = await bcrypt.hash(body.password, 10);
-    const user = await this.usersService.create({
-      email: body.email,
-      password: hashedPassword,
-      name: body.name || body.email.split('@')[0],
-      points: 400, // Eco points added during registration as per UI
-      role: UserRole.USER,
+    const signupPoints = 400;
+    const user = await this.dataSource.transaction(async (em) => {
+      const repo = em.getRepository(User);
+      const u = repo.create({
+        email: body.email,
+        password: hashedPassword,
+        name: body.name || body.email.split('@')[0],
+        points: signupPoints,
+        role: UserRole.USER,
+      });
+      await repo.save(u);
+      await this.pointLedgerService.appendTransactional(em, {
+        userId: u.id,
+        amount: signupPoints,
+        reason: PointLedgerReason.SIGNUP,
+      });
+      return u;
     });
     const { password, ...result } = user;
     return this.login(result);
+  }
+
+  async getPointLedgerSummary(userId: string) {
+    return this.pointLedgerService.getSummaryForUser(userId);
   }
 }

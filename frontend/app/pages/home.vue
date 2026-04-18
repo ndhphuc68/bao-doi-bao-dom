@@ -24,7 +24,7 @@ const shortcuts = [
   {
     label: 'Hoàn trả thiết bị',
     icon: 'pi pi-sync',
-    to: '/recycle/step-1'
+    to: '/recycle'
   },
   {
     label: 'Thiết bị hỗ trợ',
@@ -56,7 +56,7 @@ const { data: posts, pending: postsPending } = await useAsyncData('waste_posts_h
 const homeArticles = computed(() => (posts.value || []).slice(0, 4))
 
 function joinCampaign() {
-  router.push('/recycle/step-1')
+  router.push('/recycle')
 }
 </script>
 

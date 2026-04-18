@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatOrderCreated, userOrderStatusClass, userOrderStatusLabel } from '~/utils/recycling-order-display'
+
 definePageMeta({ middleware: ['require-auth'] })
 
 const token = useCookie('auth_token')
@@ -13,67 +15,6 @@ const { data: orders, pending, error, refresh } = await useAsyncData(
   },
   { watch: [token] }
 )
-
-function orderStatusLabel(st: string): string {
-  const m: Record<string, string> = {
-    PENDING: 'Chờ thu gom',
-    COMPLETED: 'Đã thu gom',
-    STORED: 'Đã nhập kho',
-    CANCELLED: 'Đã huỷ'
-  }
-  return m[st] ?? st
-}
-
-function orderStatusClass(st: string): string {
-  const base = 'rounded-full px-2 py-0.5 text-[11px] font-semibold'
-  switch (st) {
-    case 'PENDING':
-      return `${base} bg-amber-50 text-amber-800`
-    case 'COMPLETED':
-      return `${base} bg-sky-50 text-sky-800`
-    case 'STORED':
-      return `${base} bg-emerald-50 text-emerald-800`
-    case 'CANCELLED':
-      return `${base} bg-slate-100 text-slate-600`
-    default:
-      return `${base} bg-slate-100 text-slate-700`
-  }
-}
-
-function returnStatusLabel(rs?: string | null): string {
-  if (!rs || rs === 'NONE') return ''
-  const m: Record<string, string> = {
-    PENDING: 'Chờ kiểm hàng',
-    APPROVED: 'Đã nhập kho',
-    REJECTED: 'Từ chối',
-    CANCELLED: 'Đã huỷ yêu cầu'
-  }
-  return m[rs] ?? rs
-}
-
-function returnStatusClass(rs?: string | null): string {
-  const base = 'rounded-full px-2 py-0.5 text-[11px] font-semibold'
-  switch (rs) {
-    case 'PENDING':
-      return `${base} bg-amber-50 text-amber-800`
-    case 'APPROVED':
-      return `${base} bg-emerald-50 text-emerald-800`
-    case 'REJECTED':
-      return `${base} bg-rose-50 text-rose-800`
-    case 'CANCELLED':
-      return `${base} bg-slate-100 text-slate-600`
-    default:
-      return ''
-  }
-}
-
-function formatCreated(iso: string) {
-  try {
-    return new Date(iso).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' })
-  } catch {
-    return iso
-  }
-}
 </script>
 
 <template>
@@ -104,14 +45,13 @@ function formatCreated(iso: string) {
               <p class="font-mono text-sm font-bold text-slate-900">{{ o.trackingCode }}</p>
               <p class="mt-0.5 truncate text-sm font-semibold text-slate-800">{{ o.deviceName }}</p>
               <p class="truncate text-xs text-slate-500">{{ o.deviceType }} · {{ o.scheduledDate }} · {{ o.scheduledTime }}</p>
-              <p class="mt-1 text-[11px] text-slate-400">Tạo: {{ formatCreated(o.createdAt) }}</p>
+              <p class="mt-1 text-[11px] text-slate-400">Tạo: {{ formatOrderCreated(o.createdAt) }}</p>
             </div>
             <i class="pi pi-angle-right shrink-0 text-slate-400" aria-hidden="true" />
           </div>
           <div class="mt-3 flex flex-wrap gap-2">
-            <span :class="orderStatusClass(o.status)">{{ orderStatusLabel(o.status) }}</span>
-            <span v-if="returnStatusLabel(o.returnStatus)" :class="returnStatusClass(o.returnStatus)">
-              {{ returnStatusLabel(o.returnStatus) }}
+            <span :class="userOrderStatusClass(o.status, o.returnStatus)">
+              {{ userOrderStatusLabel(o.status, o.returnStatus) }}
             </span>
           </div>
         </NuxtLink>

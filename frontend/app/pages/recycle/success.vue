@@ -97,13 +97,22 @@ const deviceLine = computed(() => {
     <div
       class="border-t border-slate-200/90 bg-white/95 px-5 py-5 backdrop-blur-md supports-[padding:max(0px)]:pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6"
     >
-      <div class="mx-auto w-full max-w-md">
+      <div class="mx-auto flex w-full max-w-md flex-col gap-2">
         <Button
           label="Về trang chủ"
           fluid
           icon="pi pi-home"
           class="!rounded-2xl !py-3 font-semibold"
           @click="router.push('/home')"
+        />
+        <Button
+          label="Đơn hoàn trả của tôi"
+          fluid
+          icon="pi pi-list"
+          severity="secondary"
+          outlined
+          class="!rounded-2xl !py-3 font-semibold"
+          @click="router.push('/recycle')"
         />
       </div>
     </div>

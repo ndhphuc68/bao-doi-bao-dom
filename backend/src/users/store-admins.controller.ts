@@ -47,19 +47,22 @@ export class StoreAdminsController {
       email: string;
       password: string;
       name: string;
-      collectionPointId: string;
+      collectionPointId?: string | null;
     },
   ) {
-    if (!body?.email?.trim() || !body?.password || !body?.collectionPointId) {
-      throw new BadRequestException('email, password, collectionPointId are required');
+    if (!body?.email?.trim() || !body?.password) {
+      throw new BadRequestException('email and password are required');
     }
-    const cp = await this.points.findOne(body.collectionPointId);
-    if (!cp) throw new BadRequestException('Invalid collection point');
+    const cpId = body.collectionPointId?.trim() || null;
+    if (cpId) {
+      const cp = await this.points.findOne(cpId);
+      if (!cp) throw new BadRequestException('Invalid collection point');
+    }
     return this.users.createStoreAdmin({
       email: body.email,
       password: body.password,
       name: body.name?.trim() || body.email.split('@')[0],
-      collectionPointId: body.collectionPointId,
+      collectionPointId: cpId,
     });
   }
 

@@ -3,14 +3,14 @@ const route = useRoute()
 
 const tabs = [
   { to: '/home', label: 'Trang chủ', icon: 'pi pi-home' },
-  { to: '/recycle/step-1', label: 'Hoàn trả', icon: 'pi pi-sync' },
+  { to: '/recycle', label: 'Hoàn trả', icon: 'pi pi-sync' },
   { to: '/profile', label: 'Hồ sơ', icon: 'pi pi-user' },
   { to: '/rewards', label: 'Điểm thưởng', icon: 'pi pi-star' }
 ]
 
 function isActive(path: string) {
   if (path === '/home') return route.path === '/home'
-  if (path === '/recycle/step-1') return route.path.startsWith('/recycle')
+  if (path === '/recycle') return route.path === '/recycle' || route.path.startsWith('/recycle/')
   return route.path === path
 }
 </script>

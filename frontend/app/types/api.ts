@@ -50,6 +50,23 @@ export interface RecyclingRequestCreated {
 }
 
 /** Đơn thu gom / hoàn trả của user (GET /recycling-requests, GET /recycling-requests/me/:id) */
+/** GET /auth/point-ledger */
+export type PointLedgerReason = 'SIGNUP' | 'ORDER_APPROVED'
+
+export interface PointLedgerEntry {
+  id: string
+  amount: number
+  reason: PointLedgerReason
+  recyclingRequestId: string | null
+  trackingCode: string | null
+  createdAt: string
+}
+
+export interface PointLedgerSummary {
+  points: number
+  entries: PointLedgerEntry[]
+}
+
 export interface UserRecyclingOrder {
   id: string
   trackingCode: string
