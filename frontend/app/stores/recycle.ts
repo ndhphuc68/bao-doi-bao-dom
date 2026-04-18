@@ -21,11 +21,26 @@ export const useRecycleStore = defineStore('recycle', () => {
         deviceType.value = type;
     }
 
+    /** Đưa form về trạng thái ban đầu (gọi khi user rời khỏi luồng /recycle). */
+    function reset() {
+        deviceType.value = '';
+        deviceName.value = '';
+        manufacturer.value = '';
+        condition.value = 'WORKING';
+        images.value = [];
+        collectionPointId.value = '';
+        collectionPoint.value = {};
+        scheduledDate.value = new Date().toISOString().split('T')[0];
+        scheduledTime.value = '';
+        trackingCode.value = '';
+    }
+
     return {
         deviceType, deviceName, manufacturer, condition, images,
         collectionPointId, collectionPoint,
         scheduledDate, scheduledTime,
         trackingCode,
-        setDevice
+        setDevice,
+        reset,
     }
 });

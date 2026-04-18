@@ -1,0 +1,21 @@
+# Chỉ cài dependency — mã nguồn gắn qua volume khi chạy, hỗ trợ hot reload
+FROM node:20-alpine
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+# Windows CRLF trong .sh khiến kernel báo "no such file or directory"
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh && chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENV NODE_ENV=development
+ENV HOST=0.0.0.0
+ENV NUXT_HOST=0.0.0.0
+ENV PORT=3002
+
+EXPOSE 3002
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["npm", "run", "dev"]
+

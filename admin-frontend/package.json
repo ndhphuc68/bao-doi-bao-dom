@@ -1,0 +1,28 @@
+{
+  "name": "admin-frontend",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev --host 0.0.0.0 --port 3002",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.11.3",
+    "@primeuix/themes": "^2.0.3",
+    "nuxt": "^4.4.2",
+    "pinia": "^3.0.4",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.5.5",
+    "vue": "^3.5.32",
+    "vue-router": "^5.0.4"
+  },
+  "devDependencies": {
+    "@nuxt/icon": "^2.2.1",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@primevue/nuxt-module": "^4.5.5",
+    "@types/node": "^24.0.0"
+  }
+}

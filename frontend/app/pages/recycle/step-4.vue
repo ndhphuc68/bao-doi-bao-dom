@@ -10,10 +10,22 @@ const { data: points } = await useFetch<CollectionPointDto[]>('/collection-point
   baseURL: config.public.apiBase
 })
 
+type LatLng = { latitude: number; longitude: number }
+
+const userLocation = ref<LatLng | null>(null)
+const locationError = ref<string | null>(null)
+const locating = ref(false)
+
 const selectedPoint = ref(null)
+const mapFocus = ref<[number, number] | null>(null)
 
 function selectRow(pt) {
   selectedPoint.value = pt
+  if (pt && typeof pt.latitude === 'number' && typeof pt.longitude === 'number') {
+    mapFocus.value = [pt.latitude, pt.longitude]
+  } else {
+    mapFocus.value = null
+  }
 }
 
 function confirmPoint() {
@@ -22,6 +34,112 @@ function confirmPoint() {
   store.collectionPoint = selectedPoint.value
   router.push('/recycle/step-5')
 }
+
+function haversineKm(a: LatLng, b: LatLng) {
+  const R = 6371
+  const dLat = ((b.latitude - a.latitude) * Math.PI) / 180
+  const dLon = ((b.longitude - a.longitude) * Math.PI) / 180
+  const lat1 = (a.latitude * Math.PI) / 180
+  const lat2 = (b.latitude * Math.PI) / 180
+  const s =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)))
+}
+
+function formatDistance(km: number) {
+  if (!Number.isFinite(km)) return null
+  if (km < 1) return `${Math.round(km * 1000)} m`
+  if (km < 10) return `${km.toFixed(1)} km`
+  return `${Math.round(km)} km`
+}
+
+async function detectMyLocation() {
+  locationError.value = null
+  if (!('geolocation' in navigator)) {
+    locationError.value = 'Thiết bị không hỗ trợ định vị.'
+    return
+  }
+
+  locating.value = true
+  await new Promise<void>((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        userLocation.value = {
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude
+        }
+        resolve()
+      },
+      (err) => {
+        userLocation.value = null
+        if (err.code === err.PERMISSION_DENIED) {
+          locationError.value = 'Bạn đã từ chối quyền vị trí. Hãy bật lại để xem điểm gần nhất.'
+        } else {
+          locationError.value = 'Không lấy được vị trí hiện tại. Vui lòng thử lại.'
+        }
+        resolve()
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60_000 }
+    )
+  })
+  locating.value = false
+}
+
+onMounted(() => {
+  // Tự xin vị trí để sắp xếp điểm gần nhất
+  detectMyLocation()
+})
+
+const pointsSorted = computed(() => {
+  const raw = points.value || []
+  const loc = userLocation.value
+  if (!loc) {
+    return raw
+      .map((p) => ({
+      ...p,
+      _distanceKm: null as number | null,
+      distanceText: p.distanceText ?? null
+      }))
+      .slice(0, 4)
+  }
+
+  return raw
+    .map((p) => {
+      const km = haversineKm(loc, { latitude: p.latitude, longitude: p.longitude })
+      return {
+        ...p,
+        _distanceKm: km,
+        distanceText: formatDistance(km)
+      }
+    })
+    .sort((a, b) => {
+      if (a._distanceKm == null && b._distanceKm == null) return 0
+      if (a._distanceKm == null) return 1
+      if (b._distanceKm == null) return -1
+      return a._distanceKm - b._distanceKm
+    })
+    .slice(0, 4)
+})
+
+/** Hiển thị tất cả điểm trên bản đồ (popup); danh sách bên dưới vẫn gợi ý tối đa 4 điểm gần nhất. */
+const mapPois = computed(() => {
+  const raw = points.value || []
+  return raw
+    .filter((p) => typeof p.latitude === 'number' && typeof p.longitude === 'number')
+    .map((p) => ({
+      lat: p.latitude,
+      lng: p.longitude,
+      title: p.name,
+      description: [p.address, p.openHours].filter(Boolean).join(' · ')
+    }))
+})
+
+const userPos = computed(() =>
+  userLocation.value
+    ? { lat: userLocation.value.latitude, lng: userLocation.value.longitude }
+    : null
+)
 </script>
 
 <template>
@@ -30,37 +148,57 @@ function confirmPoint() {
 
     <div class="flex min-h-0 flex-1 flex-col">
       <!-- Map -->
-      <div class="relative h-44 shrink-0 overflow-hidden bg-slate-200">
-        <div
-          class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-sky-100 via-emerald-50/50 to-slate-100"
-        >
-          <div class="absolute inset-0 opacity-40">
-            <div
-              class="h-full w-full bg-[linear-gradient(#94a3b8_1px,transparent_1px),linear-gradient(90deg,#94a3b8_1px,transparent_1px)] bg-[size:24px_24px]"
-            />
-          </div>
-          <Icon name="heroicons:map" class="relative z-[1] h-20 w-20 text-sky-200/90 drop-shadow-sm" />
-        </div>
-        <div class="absolute left-[30%] top-1/4 z-[2] -translate-x-1/2 -translate-y-1/2">
-          <Icon
-            name="heroicons:map-pin-solid"
-            class="h-7 w-7 animate-bounce text-rose-500 drop-shadow-md"
-            style="animation-delay: 0.1s"
+      <div class="relative h-[42vh] max-h-[360px] min-h-[240px] shrink-0 overflow-hidden bg-slate-200">
+        <ClientOnly>
+          <LeafletMap
+            class="absolute inset-0"
+            :pois="mapPois"
+            :user-position="userPos"
+            :fit-bounds="!selectedPoint"
+            :focus="mapFocus"
+            :focus-zoom="16"
           />
-        </div>
-        <div class="absolute right-[28%] top-[42%] z-[2] -translate-x-1/2 -translate-y-1/2">
-          <Icon
-            name="heroicons:map-pin-solid"
-            class="h-7 w-7 animate-bounce text-rose-500 drop-shadow-md"
-            style="animation-delay: 0.35s"
-          />
-        </div>
+          <template #fallback>
+            <div class="flex h-full items-center justify-center bg-slate-100 text-sm text-slate-500">
+              Đang tải bản đồ…
+            </div>
+          </template>
+        </ClientOnly>
       </div>
 
-      <div class="flex flex-1 flex-col rounded-t-3xl border-x border-t border-slate-100 bg-white px-5 py-5 shadow-[0_-8px_24px_rgba(15,23,42,0.06)]">
+      <!-- Bottom sheet -->
+      <div
+        class="-mt-8 flex flex-1 flex-col rounded-t-3xl border-x border-t border-slate-100 bg-white px-5 py-5 shadow-[0_-8px_24px_rgba(15,23,42,0.10)]"
+      >
+        <div class="mb-3 flex justify-center">
+          <div class="h-1.5 w-14 rounded-full bg-slate-200" />
+        </div>
+
         <RecycleProgress :step="4" />
 
-        <h3 class="mb-4 text-lg font-bold tracking-tight text-slate-900">Các điểm quanh bạn</h3>
+        <div class="mb-4 flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h3 class="text-lg font-bold tracking-tight text-slate-900">Các điểm quanh bạn</h3>
+            <p class="mt-1 text-xs text-slate-500">
+              Sắp xếp theo vị trí hiện tại (lat/long) để hiện cửa hàng gần nhất.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 active:scale-[0.99]"
+            :disabled="locating"
+            @click="detectMyLocation"
+          >
+            {{ locating ? 'Đang định vị...' : 'Lấy vị trí' }}
+          </button>
+        </div>
+
+        <p
+          v-if="locationError"
+          class="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs text-amber-800"
+        >
+          {{ locationError }}
+        </p>
 
         <div class="max-h-[min(38vh,340px)] space-y-2 overflow-y-auto pr-0.5">
           <p
@@ -70,7 +208,7 @@ function confirmPoint() {
             Không tải được danh sách điểm thu. Kiểm tra backend và thử lại.
           </p>
           <button
-            v-for="pt in points || []"
+            v-for="pt in pointsSorted"
             :key="pt.id"
             type="button"
             class="flex w-full cursor-pointer rounded-2xl border p-3.5 text-left transition active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
@@ -88,6 +226,7 @@ function confirmPoint() {
               <div class="mb-1 flex items-start justify-between gap-2">
                 <h4 class="text-sm font-bold leading-tight text-slate-900">{{ pt.name }}</h4>
                 <span
+                  v-if="pt.distanceText"
                   class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
                   >{{ pt.distanceText }}</span
                 >

@@ -1,0 +1,45 @@
+# Quick Tunnel (URL *.trycloudflare.com, đổi mỗi lần chạy — không cần domain).
+# Chạy: docker compose -f docker-compose.yml -f docker-compose.quicktunnel.yml up
+# Hoặc: ./scripts/quicktunnel-up.sh
+#
+# App user: logs → cloudflared-quick (một URL: UI + /api + /uploads).
+# Admin từ xa: logs → cloudflared-quick-admin (URL thứ hai). Trong .env đặt
+#   ADMIN_NUXT_PUBLIC_API_BASE=https://<URL_app_user_KHÔNG_có_dấu_/>/api
+# rồi: docker compose -f docker-compose.yml -f docker-compose.quicktunnel.yml up -d admin-frontend
+# Admin chỉ LAN: không cần biến trên — dùng http://localhost:3002 hoặc http://<LOCAL_IP>:3002.
+
+services:
+  tunnel-dev-proxy:
+    image: nginx:alpine
+    volumes:
+      - ./dev-nginx/tunnel-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
+  cloudflared-quick:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://tunnel-dev-proxy:80
+    depends_on:
+      - tunnel-dev-proxy
+    restart: unless-stopped
+
+  cloudflared-quick-admin:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://admin-frontend:3002
+    depends_on:
+      - admin-frontend
+    restart: unless-stopped
+
+  frontend:
+    environment:
+      NUXT_PUBLIC_API_BASE: /api
+
+  backend:
+    environment:
+      CORS_REFLECT_REQUEST_ORIGIN: "true"
+
+  admin-frontend:
+    environment:
+      # Từ xa: .env → ADMIN_NUXT_PUBLIC_API_BASE=https://<host_trycloudflare_app>/api
+      NUXT_PUBLIC_API_BASE: ${ADMIN_NUXT_PUBLIC_API_BASE:-http://${LOCAL_IP:-192.168.1.211}:3001}

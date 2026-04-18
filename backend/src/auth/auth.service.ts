@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserRole } from '../users/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +20,21 @@ export class AuthService {
     return null;
   }
 
+  async getProfileById(userId: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException();
+    const { password, ...rest } = user;
+    return rest;
+  }
+
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id, name: user.name };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      name: user.name,
+      role: user.role ?? UserRole.USER,
+      collectionPointId: user.collectionPointId ?? null,
+    };
     return {
       access_token: this.jwtService.sign(payload),
       user
@@ -38,6 +52,7 @@ export class AuthService {
       password: hashedPassword,
       name: body.name || body.email.split('@')[0],
       points: 400, // Eco points added during registration as per UI
+      role: UserRole.USER,
     });
     const { password, ...result } = user;
     return this.login(result);

@@ -7,6 +7,10 @@ import { AuthModule } from './auth/auth.module';
 import { CollectionPointsModule } from './collection-points/collection-points.module';
 import { RecyclingRequestsModule } from './recycling-requests/recycling-requests.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { ReturnRequestsModule } from './return-requests/return-requests.module';
+import { WastePostsModule } from './waste-posts/waste-posts.module';
+import { SchemaPatchService } from './database/schema-patch.service';
+import { WarehouseModule } from './warehouse/warehouse.module';
 
 @Module({
   imports: [
@@ -20,9 +24,12 @@ import { UploadsModule } from './uploads/uploads.module';
     AuthModule,
     CollectionPointsModule,
     RecyclingRequestsModule,
+    ReturnRequestsModule,
     UploadsModule,
+    WarehouseModule,
+    WastePostsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SchemaPatchService],
 })
 export class AppModule {}

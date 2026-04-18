@@ -12,3 +12,15 @@
     -webkit-tap-highlight-color: transparent;
   }
 }
+
+/*
+ * Leaflet + Tailwind Preflight: mặc định img { max-width: 100% } làm lệch lớp tile → bản đồ xám/trống.
+ */
+.leaflet-container img.leaflet-tile {
+  max-width: none !important;
+}
+
+.leaflet-container img.leaflet-marker-icon,
+.leaflet-container img.leaflet-marker-shadow {
+  max-width: none !important;
+}

@@ -8,8 +8,21 @@ export enum DeviceCondition {
 }
 
 export enum RequestStatus {
+  /** Đã đặt lịch, chờ thu gom */
   PENDING = 'PENDING',
+  /** Đã thu gom tại điểm hẹn */
   COMPLETED = 'COMPLETED',
+  /** Admin đã xác nhận hoàn trả — thiết bị vào kho lưu trữ */
+  STORED = 'STORED',
+  CANCELLED = 'CANCELLED',
+}
+
+/** Luồng “hoàn trả” gắn trên cùng một đơn thu gom. */
+export enum ReturnFlowStatus {
+  NONE = 'NONE',
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
   CANCELLED = 'CANCELLED',
 }
 
@@ -55,6 +68,24 @@ export class RecyclingRequest {
 
   @Column({ type: 'enum', enum: RequestStatus, default: RequestStatus.PENDING })
   status: RequestStatus;
+
+  /** Trạng thái xử lý hoàn trả (trên chính đơn thu gom). */
+  @Column({ type: 'varchar', length: 16, default: ReturnFlowStatus.NONE })
+  returnStatus: ReturnFlowStatus;
+
+  /** Lý do hoàn trả do người dùng nhập. */
+  @Column({ type: 'text', nullable: true })
+  returnReason?: string;
+
+  /** Ghi chú admin khi xác nhận/từ chối. */
+  @Column({ type: 'text', nullable: true })
+  returnAdminNote?: string;
+
+  @Column({ nullable: true })
+  returnDecidedByUserId?: string;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  returnDecidedAt?: Date;
 
   @Column({ unique: true })
   trackingCode: string;

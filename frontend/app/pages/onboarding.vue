@@ -15,7 +15,7 @@ const slides = [
   },
   {
     title: 'Tìm điểm thu gom gần bạn',
-    body: 'Bản đồ và danh sách điểm thu được cập nhật, dễ chọn nơi phù hợp nhất.',
+    body: 'Danh sách điểm thu gom gần bạn được cập nhật, dễ chọn nơi phù hợp nhất.',
     icon: 'heroicons:map-pin'
   },
   {

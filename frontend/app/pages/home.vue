@@ -1,9 +1,11 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({
   middleware: ['require-auth']
 })
 
 const router = useRouter()
+const { wastePosts } = useApi()
+const mediaUrl = useMediaUrl()
 
 const greeting = computed(() => {
   const h = new Date().getHours()
@@ -17,7 +19,7 @@ const shortcuts = [
   {
     label: 'Tìm điểm thu gom',
     icon: 'pi pi-map-marker',
-    to: '/recycle/step-4'
+    to: '/map'
   },
   {
     label: 'Hoàn trả thiết bị',
@@ -36,18 +38,22 @@ const shortcuts = [
   }
 ]
 
-const articles = [
-  {
-    title: 'Tác hại của rác thải điện tử',
-    excerpt: 'Rác điện tử chứa chất độc hại — xử lý đúng cách giúp bảo vệ sức khỏe và môi trường.',
-    thumbClass: 'from-emerald-600/90 to-teal-800'
-  },
-  {
-    title: 'Rác thải điện tử là gì?',
-    excerpt: 'Điện thoại cũ, pin, thiết bị gia dụng hết hạn… đều được xếp vào nhóm này.',
-    thumbClass: 'from-slate-600 to-slate-800'
-  }
+const thumbClasses = [
+  'from-emerald-600/90 to-teal-800',
+  'from-slate-600 to-slate-800',
+  'from-sky-600 to-indigo-900',
+  'from-amber-500 to-orange-800'
 ]
+
+function excerptFromBody(body: string, max = 120) {
+  const t = body.replace(/\s+/g, ' ').trim()
+  if (t.length <= max) return t
+  return `${t.slice(0, max).trimEnd()}…`
+}
+
+const { data: posts, pending: postsPending } = await useAsyncData('waste_posts_home', () => wastePosts.list())
+
+const homeArticles = computed(() => (posts.value || []).slice(0, 4))
 
 function joinCampaign() {
   router.push('/recycle/step-1')
@@ -127,31 +133,44 @@ function joinCampaign() {
         </div>
       </div>
 
-      <!-- Tin tức -->
+      <!-- Tin tức từ admin -->
       <div class="mb-4">
         <div class="mb-3 flex items-center justify-between">
           <h3 class="text-base font-bold text-slate-900">Thông tin rác thải điện tử</h3>
-          <button type="button" class="text-xs font-semibold text-emerald-600">Xem tất cả</button>
+          <NuxtLink to="/articles" class="text-xs font-semibold text-emerald-600"> Xem tất cả </NuxtLink>
         </div>
-        <div class="space-y-3">
-          <article
-            v-for="(a, i) in articles"
-            :key="i"
-            class="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
+
+        <p v-if="postsPending" class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500">
+          Đang tải bài viết…
+        </p>
+        <p v-else-if="!homeArticles.length" class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500">
+          Chưa có bài viết. Admin sẽ cập nhật nội dung tại trang quản trị.
+        </p>
+        <div v-else class="space-y-3">
+          <NuxtLink
+            v-for="(a, i) in homeArticles"
+            :key="a.id"
+            :to="`/articles/${a.id}`"
+            class="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm transition active:scale-[0.99]"
           >
-            <div
-              class="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br shadow-inner"
-              :class="a.thumbClass"
-            />
+            <div class="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-100 shadow-inner">
+              <img
+                v-if="a.imageUrl"
+                :src="mediaUrl(a.imageUrl)"
+                :alt="a.title"
+                class="h-full w-full object-cover"
+              />
+              <div v-else class="h-full w-full bg-gradient-to-br" :class="thumbClasses[i % thumbClasses.length]" />
+            </div>
             <div class="min-w-0 flex-1 py-0.5">
               <h4 class="mb-1 line-clamp-2 text-sm font-bold leading-snug text-slate-900">
                 {{ a.title }}
               </h4>
               <p class="line-clamp-2 text-xs leading-relaxed text-slate-600">
-                {{ a.excerpt }}
+                {{ excerptFromBody(a.body) }}
               </p>
             </div>
-          </article>
+          </NuxtLink>
         </div>
       </div>
     </main>

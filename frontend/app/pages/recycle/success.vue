@@ -1,62 +1,111 @@
 <script setup>
+import { computed } from 'vue'
 import { useRecycleStore } from '~/stores/recycle'
 
 const store = useRecycleStore()
+const router = useRouter()
+
+const pointName = computed(() => store.collectionPoint?.name || 'Điểm thu gom')
+
+const scheduledLabel = computed(() => {
+  const d = store.scheduledDate
+  const t = store.scheduledTime?.trim() || '—'
+  if (!d) return t
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(String(d)) ? `${d}T12:00:00` : d
+  const parsed = new Date(iso)
+  const dateStr = Number.isNaN(parsed.getTime())
+    ? d
+    : parsed.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  return `${dateStr} · ${t}`
+})
+
+const deviceLine = computed(() => {
+  const n = store.deviceName?.trim()
+  const t = store.deviceType?.trim()
+  if (n && t) return `${n} · ${t}`
+  return n || t || ''
+})
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col bg-gradient-to-b from-emerald-50/50 to-slate-50">
+  <div class="flex min-h-dvh min-h-0 flex-1 flex-col bg-slate-50">
     <AppPageHeader title="Hoàn thành" />
 
-    <div class="flex flex-1 flex-col items-center px-6 pb-8 pt-2 text-center sm:px-10">
-      <div class="relative mb-8">
-        <div class="absolute inset-0 scale-125 rounded-full bg-emerald-400/20 blur-2xl" />
-        <div
-          class="relative flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-lg shadow-emerald-500/20 ring-4 ring-emerald-100"
-        >
-          <div
-            class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-inner"
-          >
-            <i class="pi pi-check text-3xl" aria-hidden="true" />
+    <div class="flex flex-1 flex-col overflow-y-auto">
+      <div class="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-4 pt-6 sm:px-6">
+        <!-- Icon -->
+        <div class="mb-8 flex justify-center">
+          <div class="relative">
+            <div
+              class="absolute -inset-3 rounded-full bg-gradient-to-br from-emerald-100/90 to-teal-100/60 blur-md"
+              aria-hidden="true"
+            />
+            <div
+              class="relative flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-md shadow-emerald-900/10 ring-1 ring-emerald-100"
+            >
+              <div
+                class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-inner"
+              >
+                <i class="pi pi-check text-2xl" aria-hidden="true" />
+              </div>
+            </div>
           </div>
         </div>
+
+        <h1 class="mb-2 text-center text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.65rem]">
+          Đặt lịch hoàn trả thành công
+        </h1>
+        <p class="mx-auto mb-8 max-w-sm text-center text-sm leading-relaxed text-slate-600">
+          Bạn đã đăng ký hoàn trả một thiết bị điện tử tới
+          <span class="font-semibold text-slate-800">{{ pointName }}</span
+          >. Vui lòng mang thiết bị đến đúng thời gian đã hẹn.
+        </p>
+
+        <div
+          v-if="deviceLine"
+          class="mb-6 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-center text-sm text-slate-700 shadow-sm"
+        >
+          <span class="text-slate-500">Thiết bị: </span>
+          <span class="font-semibold text-slate-900">{{ deviceLine }}</span>
+        </div>
+
+        <!-- Thẻ thông tin -->
+        <div
+          class="rounded-2xl border border-slate-200/90 bg-white px-5 py-5 shadow-sm shadow-slate-900/5"
+        >
+          <p class="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
+            Mã xác nhận
+          </p>
+          <p class="mb-5 font-mono text-2xl font-bold tabular-nums tracking-tight text-slate-900 sm:text-[1.75rem]">
+            {{ store.trackingCode || '—' }}
+          </p>
+          <div class="mb-1 h-px w-full bg-slate-100" />
+          <p class="mb-1.5 mt-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+            Thời gian
+          </p>
+          <p class="flex items-center justify-start gap-2 text-base font-semibold text-slate-900">
+            <i class="pi pi-calendar text-emerald-600/90" aria-hidden="true" />
+            {{ scheduledLabel }}
+          </p>
+        </div>
+
+        <div class="min-h-6 flex-1" />
       </div>
-
-      <h2 class="mb-3 max-w-sm text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-        Đặt lịch hoàn trả<br />thành công
-      </h2>
-      <p class="mb-8 max-w-md text-pretty text-sm leading-relaxed text-slate-600">
-        Bạn đã đăng ký hoàn trả 1 thiết bị điện tử tới
-        <span class="font-semibold text-slate-800">{{ store.collectionPoint?.name || 'Điểm thu gom' }}</span
-        >. Vui lòng mang thiết bị đến đúng thời gian đã hẹn.
-      </p>
-
-      <Card class="mb-10 w-full max-w-md text-left shadow-lg" :pt="{ root: { class: 'rounded-3xl overflow-hidden' } }">
-        <template #content>
-          <p class="mb-1 text-[10px] font-bold uppercase tracking-widest text-emerald-600">Mã xác nhận</p>
-          <h3 class="mb-6 font-mono text-3xl font-black tracking-widest text-slate-900">
-            {{ store.trackingCode || 'ECO-2045' }}
-          </h3>
-          <Divider />
-          <p class="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Thời gian</p>
-          <p class="text-sm font-bold text-slate-800">{{ store.scheduledDate }} · {{ store.scheduledTime }}</p>
-        </template>
-      </Card>
     </div>
 
+    <!-- CTA -->
     <div
-      class="mt-auto flex flex-col gap-3 border-t border-slate-100 bg-white/95 px-5 py-6 shadow-[0_-15px_40px_rgba(15,23,42,0.06)] backdrop-blur-sm sm:px-8"
+      class="border-t border-slate-200/90 bg-white/95 px-5 py-5 backdrop-blur-md supports-[padding:max(0px)]:pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6"
     >
-      <Button label="Về trang chủ" fluid rounded size="large" icon="pi pi-home" @click="navigateTo('/home')" />
-      <Button
-        label="Xem biên nhận"
-        fluid
-        rounded
-        severity="secondary"
-        outlined
-        icon="pi pi-file"
-        @click="navigateTo('/home')"
-      />
+      <div class="mx-auto w-full max-w-md">
+        <Button
+          label="Về trang chủ"
+          fluid
+          icon="pi pi-home"
+          class="!rounded-2xl !py-3 font-semibold"
+          @click="router.push('/home')"
+        />
+      </div>
     </div>
   </div>
 </template>

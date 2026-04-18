@@ -4,7 +4,9 @@ import type {
   CollectionPointDto,
   CreateRecyclingRequestBody,
   RecyclingRequestCreated,
-  UploadRecyclingImagesResponse
+  UploadRecyclingImagesResponse,
+  UserRecyclingOrder,
+  WastePostDto
 } from '~/types/api'
 
 function joinBase(base: string, path: string): string {
@@ -39,11 +41,30 @@ export function useApi() {
     collectionPoints: {
       list: () => apiFetch<CollectionPointDto[]>('/collection-points')
     },
+    wastePosts: {
+      list: () => apiFetch<WastePostDto[]>('/waste-posts'),
+      get: (id: string) => apiFetch<WastePostDto>(`/waste-posts/${id}`)
+    },
     recyclingRequests: {
       create: (token: string, body: CreateRecyclingRequestBody) =>
         apiFetch<RecyclingRequestCreated>('/recycling-requests', {
           method: 'POST',
           body,
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      listMine: (token: string) =>
+        apiFetch<UserRecyclingOrder[]>('/recycling-requests', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      getMine: (token: string, id: string) =>
+        apiFetch<UserRecyclingOrder>(`/recycling-requests/me/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+    },
+    returnRequests: {
+      cancelMine: (token: string, id: string) =>
+        apiFetch<UserRecyclingOrder>(`/return-requests/${id}/cancel`, {
+          method: 'PATCH',
           headers: { Authorization: `Bearer ${token}` }
         })
     },

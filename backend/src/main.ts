@@ -12,10 +12,18 @@ async function bootstrap() {
 
   const corsOrigins = process.env.FRONTEND_ORIGIN
     ? process.env.FRONTEND_ORIGIN.split(',').map((o) => o.trim())
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+    : [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:3002',
+        'http://127.0.0.1:3002',
+      ];
+
+  /** Dev: Quick Tunnel / origin đổi (*.trycloudflare.com) — chỉ bật khi compose.quicktunnel bật CORS_REFLECT_REQUEST_ORIGIN */
+  const reflectCors = process.env.CORS_REFLECT_REQUEST_ORIGIN === 'true';
 
   app.enableCors({
-    origin: corsOrigins,
+    origin: reflectCors ? true : corsOrigins,
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],

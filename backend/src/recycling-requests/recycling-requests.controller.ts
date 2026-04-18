@@ -25,6 +25,11 @@ export class RecyclingRequestsController {
     return this.service.findByUser(req.user.userId);
   }
 
+  @Get('me/:id')
+  findMineById(@Request() req, @Param('id') id: string) {
+    return this.service.findByIdForUser(req.user.userId, id);
+  }
+
   @Get(':code')
   findOne(@Param('code') code: string) {
     return this.service.findByTrackingCode(code);

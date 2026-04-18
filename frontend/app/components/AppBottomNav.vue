@@ -3,7 +3,6 @@ const route = useRoute()
 
 const tabs = [
   { to: '/home', label: 'Trang chủ', icon: 'pi pi-home' },
-  { to: '/map', label: 'Bản đồ', icon: 'pi pi-map-marker' },
   { to: '/recycle/step-1', label: 'Hoàn trả', icon: 'pi pi-sync' },
   { to: '/profile', label: 'Hồ sơ', icon: 'pi pi-user' },
   { to: '/rewards', label: 'Điểm thưởng', icon: 'pi pi-star' }
