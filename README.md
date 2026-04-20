@@ -44,6 +44,9 @@ docker compose down
 
 ## 2. Cloudflare — hai cách
 
+**Mặc định khi chạy Cloudflare tunnel, stack sẽ chạy theo chế độ production** (build trước rồi serve) qua file `docker-compose.prod.yml`.
+Nếu bạn muốn chạy kiểu dev (hot reload), xem lệnh “dev” ở mỗi mục bên dưới.
+
 ### A) Quick Tunnel (`*.trycloudflare.com`) — không cần domain, URL đổi mỗi lần chạy
 
 Dùng khi muốn chia sẻ nhanh app + API **cùng một origin** (Nginx gộp `/` → frontend, `/api/` → backend).
@@ -51,13 +54,29 @@ Dùng khi muốn chia sẻ nhanh app + API **cùng một origin** (Nginx gộp `
 ```bash
 ./scripts/quicktunnel-up.sh
 # tương đương:
-# docker compose -f docker-compose.yml -f docker-compose.quicktunnel.yml up
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.quicktunnel.yml up
+```
+
+**Chạy quick tunnel kiểu dev (HMR, phục vụ phát triển)**
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.quicktunnel.yml up --build
 ```
 
 **Xem URL public**
 
 - Trong log Docker, tìm container **`cloudflared-quick`** → một dòng URL dạng `https://xxxx.trycloudflare.com` (app user: UI + API qua `/api`).
 - Container **`cloudflared-quick-admin`** → URL thứ hai cho **admin** (port 3002).
+
+**Nếu URL app user không vào được**
+
+- Xem log theo thứ tự:
+  - `tunnel-dev-proxy` (Nginx) có lên không
+  - `frontend` có “listening” trên port `3000` không
+  - `backend` có “listening” trên port `3000` không
+  - `cloudflared-quick` có in ra URL `trycloudflare.com` không
+- Đảm bảo bạn đang chạy đúng file compose (production):
+  - `docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.quicktunnel.yml up --build`
 
 **Admin từ xa (qua tunnel)**
 
@@ -86,6 +105,12 @@ Dùng khi muốn chia sẻ nhanh app + API **cùng một origin** (Nginx gộp `
    ```
 
 3. Chạy kèm profile `tunnel`:
+
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile tunnel up --build
+   ```
+
+   Chạy kiểu dev (hot reload):
 
    ```bash
    docker compose --profile tunnel up --build

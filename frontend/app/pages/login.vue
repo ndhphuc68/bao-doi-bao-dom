@@ -4,7 +4,7 @@ import { useToast } from 'primevue/usetoast'
 import { getApiErrorMessage } from '~/utils/api/errors'
 
 definePageMeta({
-  middleware: ['require-onboarding']
+  middleware: ['redirect-if-logged-in']
 })
 
 const email = ref('demo@gmail.com')
