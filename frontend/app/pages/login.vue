@@ -36,9 +36,9 @@ const handleLogin = async () => {
 
     <div class="relative mb-5 flex justify-center">
       <div
-        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md"
+        class="flex h-36 w-36 items-center justify-center rounded-[2.5rem] bg-white p-3 shadow-sm ring-1 ring-slate-200/50"
       >
-        <i class="pi pi-sync text-2xl" aria-hidden="true" />
+        <img src="/logo_splash.png" alt="Eco Logo" class="h-full w-full object-contain" />
       </div>
     </div>
 
@@ -86,21 +86,6 @@ const handleLogin = async () => {
           Chưa có tài khoản?
           <NuxtLink to="/register" class="ml-1 font-semibold text-emerald-600 hover:underline">Đăng ký ngay</NuxtLink>
         </p>
-
-        <Divider align="center" type="solid">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Hoặc</span>
-        </Divider>
-
-        <div class="flex flex-col gap-2.5">
-          <Button type="button" outlined severity="secondary" fluid rounded class="!border-slate-200">
-            <Icon name="simple-icons:google" class="mr-2 h-5 w-5" />
-            Tiếp tục với Google
-          </Button>
-          <Button type="button" severity="contrast" fluid rounded>
-            <Icon name="simple-icons:apple" class="mr-2 h-5 w-5" />
-            Tiếp tục với Apple
-          </Button>
-        </div>
       </div>
     </div>
   </div>

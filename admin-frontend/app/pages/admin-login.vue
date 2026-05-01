@@ -9,6 +9,10 @@ const router = useRouter()
 const toast = useToast()
 const { apiFetch } = useApi()
 
+useHead({
+  title: 'Eco Admin - Đăng nhập'
+})
+
 const handleLogin = async () => {
   try {
     const res = await apiFetch<{ access_token: string }>('/auth/login', {
@@ -30,9 +34,9 @@ const handleLogin = async () => {
   <div class="mx-auto flex w-full max-w-md flex-col gap-5 px-6 py-10">
     <div class="text-center">
       <div
-        class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md"
+        class="mx-auto mb-3 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white p-2 shadow-sm ring-1 ring-slate-200/50"
       >
-        <i class="pi pi-shield text-2xl" aria-hidden="true" />
+        <img src="/logo_splash.png" alt="Eco Logo" class="h-full w-full object-contain" />
       </div>
       <h1 class="text-2xl font-bold tracking-tight">Eco Admin</h1>
       <p class="mt-1 text-sm text-slate-600">Đăng nhập để vào trang quản trị.</p>

@@ -7,6 +7,10 @@ const router = useRouter()
 const { wastePosts } = useApi()
 const mediaUrl = useMediaUrl()
 
+useHead({
+  title: 'Eco - Tái chế điện tử'
+})
+
 const greeting = computed(() => {
   const h = new Date().getHours()
   if (h >= 5 && h < 11) return 'Chào buổi sáng'
@@ -66,10 +70,10 @@ function joinCampaign() {
     <header class="sticky top-0 z-20 flex items-center justify-between bg-white/95 px-4 py-3 backdrop-blur-md">
       <div class="flex min-w-0 items-center gap-3">
         <Avatar
-          icon="pi pi-user"
+          image="/logo_splash.png"
           shape="circle"
           size="large"
-          class="!h-12 !w-12 !bg-emerald-100 !text-emerald-700"
+          class="!h-12 !w-12 border border-slate-100 bg-white"
         />
         <div class="min-w-0">
           <p class="truncate text-sm font-bold leading-tight text-slate-900">
@@ -84,32 +88,31 @@ function joinCampaign() {
     <main class="flex-1 overflow-y-auto px-4 pb-28 pt-2">
       <!-- Hero -->
       <div
-        class="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-950 px-5 py-7 text-white shadow-lg shadow-emerald-900/20"
+        class="relative mb-6 overflow-hidden rounded-3xl bg-slate-900 px-5 py-7 text-white shadow-lg shadow-emerald-900/20"
       >
-        <div
-          class="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-emerald-400/20 blur-3xl"
-        />
-        <div
-          class="pointer-events-none absolute -bottom-10 -left-10 h-36 w-36 rounded-full bg-teal-400/15 blur-3xl"
-        />
-        <div
-          class="pointer-events-none absolute inset-0 opacity-[0.12] bg-[radial-gradient(circle_at_30%_20%,#fff_0%,transparent_50%)]"
-        />
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+          <img src="/banner_campaign.png" alt="Campaign Banner" class="h-full w-full object-cover opacity-70" />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent"></div>
+        </div>
 
-        <span
-          class="mb-3 inline-block rounded-full bg-emerald-400/25 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-50 ring-1 ring-white/20"
-        >
-          Chiến dịch mới
-        </span>
-        <h2 class="mb-5 max-w-[95%] text-xl font-extrabold leading-snug tracking-tight">
-          Cùng nhau giảm rác thải điện tử tại Đà Nẵng.
-        </h2>
-        <Button
-          label="Tham gia ngay"
-          rounded
-          class="!border-0 !bg-white/15 !text-white backdrop-blur-sm hover:!bg-white/25"
-          @click="joinCampaign"
-        />
+        <!-- Content -->
+        <div class="relative z-10">
+          <span
+            class="mb-3 inline-block rounded-full bg-emerald-400/25 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-50 ring-1 ring-white/20"
+          >
+            Chiến dịch mới
+          </span>
+          <h2 class="mb-5 max-w-[95%] text-xl font-extrabold leading-snug tracking-tight">
+            Cùng nhau giảm rác thải điện tử tại Đà Nẵng.
+          </h2>
+          <Button
+            label="Tham gia ngay"
+            rounded
+            class="!border-0 !bg-white/20 !text-white backdrop-blur-md hover:!bg-white/30"
+            @click="joinCampaign"
+          />
+        </div>
       </div>
 
       <!-- Lối tắt -->

@@ -60,6 +60,10 @@ const handleLogout = async () => {
   token.value = null
   await router.push('/admin-login')
 }
+
+useHead({
+  title: 'Eco Admin - Quản trị'
+})
 </script>
 
 <template>
@@ -69,9 +73,9 @@ const handleLogout = async () => {
         <div class="mb-4 flex items-center justify-between gap-3">
           <NuxtLink to="/admin" class="flex items-center gap-2">
             <div
-              class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+              class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white"
             >
-              <i class="pi pi-shield" aria-hidden="true" />
+              <img src="/logo_splash.png" alt="Eco Logo" class="h-full w-full object-contain p-1" />
             </div>
             <div class="leading-tight">
               <div class="text-sm font-semibold">Eco Admin</div>

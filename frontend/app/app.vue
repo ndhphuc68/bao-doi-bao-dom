@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import Toast from 'primevue/toast'
+
+const isSplashVisible = ref(true)
+
+onMounted(() => {
+  setTimeout(() => {
+    isSplashVisible.value = false
+  }, 3000)
+})
 </script>
 
 <template>
@@ -11,7 +19,8 @@ import Toast from 'primevue/toast'
       class="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col bg-white pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-[env(safe-area-inset-top,0px)] shadow-[0_0_0_1px_rgba(15,23,42,0.06)]"
     >
       <Toast />
-      <NuxtLayout>
+      <SplashScreen :is-visible="isSplashVisible" />
+      <NuxtLayout v-show="!isSplashVisible">
         <NuxtPage />
       </NuxtLayout>
     </div>
