@@ -1,6 +1,8 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['require-auth'] })
-useHead({ title: 'Hồ sơ' })
+const { t } = useI18n()
+const localePath = useLocalePath()
+useHead({ title: t('nav.profile') })
 
 const config = useRuntimeConfig()
 const token = useCookie('auth_token')
@@ -46,9 +48,8 @@ const router = useRouter()
 const payload = computed(() => decodeJwt(token.value))
 
 function roleLabel(role?: string) {
-  if (role === 'SUPER_ADMIN') return 'Admin tổng'
-  if (role === 'STORE_ADMIN') return 'Admin cửa hàng'
-  return 'Người dùng'
+  if (role === 'SUPER_ADMIN') return t('profile.role_admin')
+  return t('profile.role_user')
 }
 
 const displayName = computed(() => {
@@ -56,7 +57,7 @@ const displayName = computed(() => {
   const p = payload.value || {}
   const name = typeof p.name === 'string' ? p.name.trim() : ''
   const email = typeof p.email === 'string' ? p.email.trim() : ''
-  return name || (email ? email.split('@')[0] : '') || 'Người dùng mới'
+  return name || (email ? email.split('@')[0] : '') || t('profile.new_user')
 })
 
 const displayRole = computed(() => roleLabel(profile.value?.role))
@@ -70,16 +71,16 @@ const displayPhone = computed(() => {
 
 function logout() {
   token.value = null
-  router.push('/login')
+  router.push(localePath('/login'))
 }
 </script>
 
 <template>
   <div class="min-h-[100dvh] bg-slate-50 pb-28">
-    <AppPageHeader title="Hồ sơ cá nhân" />
+    <AppPageHeader :title="t('profile.title')" />
     <div class="hidden md:block px-8 py-6">
-      <h1 class="text-2xl font-extrabold text-slate-900">Hồ sơ cá nhân</h1>
-      <p class="text-sm text-slate-500">Quản lý thông tin tài khoản và hoạt động của bạn</p>
+      <h1 class="text-2xl font-extrabold text-slate-900">{{ t('profile.title') }}</h1>
+      <p class="text-sm text-slate-500">{{ t('profile.subtitle') }}</p>
     </div>
 
     <div class="px-5 pt-4">
@@ -102,83 +103,83 @@ function logout() {
           {{ displayRole }}
         </p>
         <NuxtLink
-          to="/rewards"
+          :to="localePath('/rewards')"
           class="mt-3 inline-flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200/80 transition hover:bg-emerald-100"
         >
           <i class="pi pi-star-fill text-amber-500" aria-hidden="true" />
-          <span>Điểm xanh: {{ profile?.points ?? '—' }}</span>
+          <span>{{ t('profile.green_points') }}: {{ profile?.points ?? '—' }}</span>
           <i class="pi pi-angle-right text-emerald-600/80" aria-hidden="true" />
         </NuxtLink>
       </div>
 
       <div class="mt-5 rounded-3xl bg-white p-2 shadow-[0_10px_30px_rgba(15,23,42,0.06)]">
         <p class="px-3 pb-2 pt-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-          Tài khoản &amp; hoạt động
+          {{ t('profile.account_activity') }}
         </p>
 
         <NuxtLink
-          to="/profile/edit"
+          :to="localePath('/profile/edit')"
           class="flex items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-slate-50 active:scale-[0.995]"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
             <i class="pi pi-pencil" aria-hidden="true" />
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-bold text-slate-900">Chỉnh sửa thông tin</p>
+            <p class="text-sm font-bold text-slate-900">{{ t('profile.edit_info') }}</p>
           </div>
           <i class="pi pi-angle-right text-slate-400" aria-hidden="true" />
         </NuxtLink>
 
         <NuxtLink
-          to="/profile/history"
+          :to="localePath('/profile/history')"
           class="flex items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-slate-50 active:scale-[0.995]"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
             <i class="pi pi-history" aria-hidden="true" />
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-bold text-slate-900">Lịch sử đóng góp</p>
-            <p class="text-xs text-slate-400">Trống</p>
+            <p class="text-sm font-bold text-slate-900">{{ t('profile.contribution_history') }}</p>
+            <p class="text-xs text-slate-400">{{ t('profile.empty') }}</p>
           </div>
           <i class="pi pi-angle-right text-slate-400" aria-hidden="true" />
         </NuxtLink>
 
         <NuxtLink
-          to="/profile/returns"
+          :to="localePath('/profile/returns')"
           class="flex items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-slate-50 active:scale-[0.995]"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
             <i class="pi pi-list" aria-hidden="true" />
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-bold text-slate-900">Đơn hoàn trả của tôi</p>
-            <p class="text-xs text-slate-400">Theo dõi trạng thái đơn đã đặt</p>
+            <p class="text-sm font-bold text-slate-900">{{ t('profile.my_returns') }}</p>
+            <p class="text-xs text-slate-400">{{ t('profile.track_status') }}</p>
           </div>
           <i class="pi pi-angle-right text-slate-400" aria-hidden="true" />
         </NuxtLink>
 
         <NuxtLink
-          to="/profile/badges"
+          :to="localePath('/profile/badges')"
           class="flex items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-slate-50 active:scale-[0.995]"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
             <i class="pi pi-trophy" aria-hidden="true" />
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-bold text-slate-900">Điểm thưởng &amp; Huy hiệu</p>
+            <p class="text-sm font-bold text-slate-900">{{ t('profile.badges_rewards') }}</p>
           </div>
           <i class="pi pi-angle-right text-slate-400" aria-hidden="true" />
         </NuxtLink>
 
         <NuxtLink
-          to="/profile/support"
+          :to="localePath('/profile/support')"
           class="flex items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-slate-50 active:scale-[0.995]"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
             <i class="pi pi-question-circle" aria-hidden="true" />
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-bold text-slate-900">Trung tâm hỗ trợ</p>
+            <p class="text-sm font-bold text-slate-900">{{ t('profile.support_center') }}</p>
           </div>
           <i class="pi pi-angle-right text-slate-400" aria-hidden="true" />
         </NuxtLink>
@@ -190,7 +191,7 @@ function logout() {
         @click="logout"
       >
         <i class="pi pi-sign-out" aria-hidden="true" />
-        Đăng xuất
+        {{ t('auth.logout') }}
       </button>
     </div>
 

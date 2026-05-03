@@ -23,7 +23,7 @@
             Eco
           </h1>
           <p class="mt-1 animate-in slide-in-from-bottom duration-700 delay-500 fill-mode-both text-sm font-medium text-slate-500">
-            Tái chế thông minh, tương lai xanh
+            {{ t('common.tagline') }}
           </p>
         </div>
       </div>
@@ -41,6 +41,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 defineProps<{
   isVisible: boolean
 }>()

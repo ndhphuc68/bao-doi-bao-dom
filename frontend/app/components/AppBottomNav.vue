@@ -1,18 +1,23 @@
 <script setup lang="ts">
+const localePath = useLocalePath()
 const route = useRoute()
 
-const tabs = [
-  { to: '/home', label: 'Trang chủ', icon: 'pi pi-home' },
-  { to: '/recycle', label: 'Hoàn trả', icon: 'pi pi-sync' },
-  { to: '/community', label: 'Cộng đồng', icon: 'pi pi-users' },
-  { to: '/rewards', label: 'Ưu đãi', icon: 'pi pi-gift' },
-  { to: '/profile', label: 'Hồ sơ', icon: 'pi pi-user' }
-]
+const { t } = useI18n()
+
+const tabs = computed(() => [
+  { to: '/home', label: t('nav.home'), icon: 'pi pi-home' },
+  { to: '/recycle', label: t('nav.recycle'), icon: 'pi pi-sync' },
+  { to: '/community', label: t('nav.community'), icon: 'pi pi-users' },
+  { to: '/rewards', label: t('nav.rewards'), icon: 'pi pi-gift' },
+  { to: '/profile', label: t('nav.profile'), icon: 'pi pi-user' }
+])
 
 function isActive(path: string) {
-  if (path === '/home') return route.path === '/home'
-  if (path === '/recycle') return route.path === '/recycle' || route.path.startsWith('/recycle/')
-  return route.path === path
+  const p = localePath(path)
+  // For home, also match root path
+  if (path === '/home') return route.path === p || route.path === localePath('/')
+  if (path === '/recycle') return route.path === p || route.path.startsWith(p + '/')
+  return route.path === p
 }
 </script>
 
@@ -25,7 +30,7 @@ function isActive(path: string) {
       <NuxtLink
         v-for="tab in tabs"
         :key="tab.to"
-        :to="tab.to"
+        :to="localePath(tab.to)"
         class="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-[10px] font-semibold transition-colors sm:text-[11px]"
         :class="
           isActive(tab.to)

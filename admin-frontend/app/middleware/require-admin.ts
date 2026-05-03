@@ -17,9 +17,9 @@ export default defineNuxtRouteMiddleware(async () => {
     const email = String(profile?.email || '').trim().toLowerCase()
     const role = String(profile?.role || 'USER')
 
-    // Khớp backend AdminAccessGuard: SUPER/STORE hoặc email trong allowlist, hoặc allowlist rỗng (dev/demo).
+    // Khớp backend AdminAccessGuard: SUPER hoặc email trong allowlist, hoặc allowlist rỗng (dev/demo).
     if (allow.length === 0) return
-    if (role === 'SUPER_ADMIN' || role === 'STORE_ADMIN') return
+    if (role === 'SUPER_ADMIN') return
     if (email && allow.includes(email)) return
     return navigateTo('/admin/forbidden')
   } catch {

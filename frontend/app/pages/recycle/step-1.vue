@@ -1,32 +1,35 @@
 <script setup>
 import { useRecycleStore } from '~/stores/recycle'
 
+const { t } = useI18n()
+const localePath = useLocalePath()
+
 const router = useRouter()
 const store = useRecycleStore()
 
-const devices = [
-  { id: 'phone', name: 'Điện thoại', icon: 'heroicons:device-phone-mobile' },
-  { id: 'mouse', name: 'Chuột', icon: 'heroicons:computer-desktop' },
-  { id: 'desktop', name: 'Máy tính để bàn', icon: 'heroicons:tv' },
-  { id: 'other', name: 'Khác', icon: 'heroicons:cube' }
-]
+const devices = computed(() => [
+  { id: 'phone', name: t('recycle.device_phone'), icon: 'heroicons:device-phone-mobile' },
+  { id: 'mouse', name: t('recycle.device_mouse'), icon: 'heroicons:computer-desktop' },
+  { id: 'desktop', name: t('recycle.device_desktop'), icon: 'heroicons:tv' },
+  { id: 'other', name: t('recycle.device_other'), icon: 'heroicons:cube' }
+])
 
 const selectDevice = (id) => {
-  store.setDevice(devices.find((d) => d.id === id).name)
+  store.setDevice(devices.value.find((d) => d.id === id).name)
 }
 </script>
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col bg-white">
-    <AppPageHeader title="Thu gom thiết bị" back-to="/recycle" />
+    <AppPageHeader :title="t('recycle.step1_title')" :back-to="localePath('/recycle')" />
 
     <div class="flex-1 px-5 pb-6 pt-2 sm:px-8">
       <RecycleProgress :step="1" />
 
       <h3 class="mb-2 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-        Bạn muốn thu gom loại thiết bị nào?
+        {{ t('recycle.step1_question') }}
       </h3>
-      <p class="mb-6 text-sm text-slate-600">Chọn thiết bị điện tử bạn muốn gửi tái chế.</p>
+      <p class="mb-6 text-sm text-slate-600">{{ t('recycle.step1_desc') }}</p>
 
       <div class="grid grid-cols-2 gap-3 sm:gap-4">
         <Card
@@ -67,12 +70,12 @@ const selectDevice = (id) => {
 
     <div class="border-t border-slate-100 bg-white/90 px-5 py-5 backdrop-blur-sm sm:px-8">
       <Button
-        label="Tiếp tục"
+        :label="t('recycle.continue')"
         fluid
         rounded
         size="large"
         :disabled="!store.deviceType"
-        @click="store.deviceType ? router.push('/recycle/step-2') : null"
+        @click="store.deviceType ? router.push(localePath('/recycle/step-2')) : null"
       />
     </div>
   </div>

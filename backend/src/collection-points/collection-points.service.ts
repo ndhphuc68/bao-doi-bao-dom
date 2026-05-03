@@ -27,4 +27,18 @@ export class CollectionPointsService implements OnModuleInit {
   async findOne(id: string): Promise<CollectionPoint | null> {
     return this.cpRepository.findOneBy({ id });
   }
+
+  async create(dto: Partial<CollectionPoint>): Promise<CollectionPoint> {
+    const cp = this.cpRepository.create(dto);
+    return this.cpRepository.save(cp);
+  }
+
+  async update(id: string, dto: Partial<CollectionPoint>): Promise<CollectionPoint | null> {
+    await this.cpRepository.update(id, dto);
+    return this.findOne(id);
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.cpRepository.delete(id);
+  }
 }

@@ -3,10 +3,13 @@ import { computed, ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { getApiErrorMessage } from '~/utils/api/errors'
 
+const { t } = useI18n()
+const localePath = useLocalePath()
+
 definePageMeta({
   middleware: ['redirect-if-logged-in']
 })
-useHead({ title: 'Đăng ký tài khoản' })
+useHead({ title: t('register.title') })
 
 const name = ref('')
 const phone = ref('')
@@ -27,15 +30,15 @@ const canSubmit = computed(() => {
 const handleRegister = async () => {
   if (!canSubmit.value) {
     if (!email.value.trim()) {
-      toast.add({ severity: 'warn', summary: 'Thiếu thông tin', detail: 'Vui lòng nhập email.', life: 3000 })
+      toast.add({ severity: 'warn', summary: t('register.missing_info'), detail: t('register.missing_email'), life: 3000 })
       return
     }
     if (!password.value) {
-      toast.add({ severity: 'warn', summary: 'Thiếu thông tin', detail: 'Vui lòng nhập mật khẩu.', life: 3000 })
+      toast.add({ severity: 'warn', summary: t('register.missing_info'), detail: t('register.missing_password'), life: 3000 })
       return
     }
     if (password.value !== confirmPassword.value) {
-      toast.add({ severity: 'warn', summary: 'Chưa đúng', detail: 'Mật khẩu nhập lại không khớp.', life: 3000 })
+      toast.add({ severity: 'warn', summary: t('register.not_correct'), detail: t('register.password_mismatch'), life: 3000 })
       return
     }
     return
@@ -50,10 +53,10 @@ const handleRegister = async () => {
     })
     const token = useCookie('auth_token')
     token.value = res.access_token
-    toast.add({ severity: 'success', summary: 'Thành công', detail: 'Đăng ký thành công!', life: 2500 })
-    router.push('/home')
+    toast.add({ severity: 'success', summary: t('common.vietnamese') === 'Tiếng Việt' ? 'Thành công' : 'Success', detail: t('register.success'), life: 2500 })
+    router.push(localePath('/home'))
   } catch (err) {
-    toast.add({ severity: 'error', summary: 'Đăng ký thất bại', detail: getApiErrorMessage(err), life: 3500 })
+    toast.add({ severity: 'error', summary: t('register.fail'), detail: getApiErrorMessage(err), life: 3500 })
   }
 }
 </script>
@@ -71,9 +74,9 @@ const handleRegister = async () => {
         <div class="mb-8 rounded-3xl bg-white p-5 shadow-2xl shadow-emerald-500/20 transition-transform hover:scale-105">
           <img src="/logo_splash.png" alt="Eco Logo" class="h-24 w-24 object-contain" />
         </div>
-        <h2 class="mb-4 text-4xl font-black tracking-tight lg:text-5xl">Bắt đầu hành trình của bạn.</h2>
+        <h2 class="mb-4 text-4xl font-black tracking-tight lg:text-5xl">{{ t('register.hero_title') }}</h2>
         <p class="max-w-md text-lg font-medium text-emerald-50/80">
-          Trở thành một phần của mạng lưới tái chế rác thải điện tử lớn nhất miền Trung và bắt đầu tích điểm ngay hôm nay.
+          {{ t('register.hero_subtitle') }}
         </p>
         
         <div class="mt-12 flex items-center gap-4 rounded-2xl bg-white/10 p-6 backdrop-blur-md">
@@ -81,8 +84,8 @@ const handleRegister = async () => {
             <i class="pi pi-gift text-xl"></i>
           </div>
           <div class="text-left">
-            <p class="text-sm font-black text-white">Quà tặng đặc biệt</p>
-            <p class="text-xs text-emerald-100/70">Nhận ngay 400 điểm thưởng khi đăng ký thành công.</p>
+            <p class="text-sm font-black text-white">{{ t('register.promo_title') }}</p>
+            <p class="text-xs text-emerald-100/70">{{ t('register.promo_desc') }}</p>
           </div>
         </div>
       </div>
@@ -99,25 +102,25 @@ const handleRegister = async () => {
         </div>
 
         <div class="text-center md:text-left">
-          <h1 class="text-3xl font-black tracking-tight text-slate-900">Tạo tài khoản</h1>
-          <p class="mt-2 text-sm font-medium text-slate-500">Tham gia cùng hàng ngàn Eco-ers bảo vệ môi trường.</p>
+          <h1 class="text-3xl font-black tracking-tight text-slate-900">{{ t('register.form_title') }}</h1>
+          <p class="mt-2 text-sm font-medium text-slate-500">{{ t('register.form_subtitle') }}</p>
         </div>
 
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-1.5">
-              <label for="register-name" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Họ tên</label>
+              <label for="register-name" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">{{ t('register.name_label') }}</label>
               <InputText
                 id="register-name"
                 v-model="name"
                 type="text"
-                placeholder="Nguyễn Văn A"
+                :placeholder="t('register.name_placeholder')"
                 fluid
                 class="!rounded-2xl !py-3 !border-slate-100 !bg-slate-50/50 hover:!bg-white focus:!bg-white"
               />
             </div>
             <div class="space-y-1.5">
-              <label for="register-phone" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Số điện thoại</label>
+              <label for="register-phone" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">{{ t('register.phone_label') }}</label>
               <InputText
                 id="register-phone"
                 v-model="phone"
@@ -130,7 +133,7 @@ const handleRegister = async () => {
           </div>
 
           <div class="space-y-1.5">
-            <label for="register-email" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Email</label>
+            <label for="register-email" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">{{ t('register.email_label') }}</label>
             <InputText
               id="register-email"
               v-model="email"
@@ -143,7 +146,7 @@ const handleRegister = async () => {
 
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-1.5">
-              <label for="register-pass" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Mật khẩu</label>
+              <label for="register-pass" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">{{ t('register.password_label') }}</label>
               <Password
                 id="register-pass"
                 v-model="password"
@@ -155,7 +158,7 @@ const handleRegister = async () => {
               />
             </div>
             <div class="space-y-1.5">
-              <label for="register-pass2" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Xác nhận</label>
+              <label for="register-pass2" class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">{{ t('register.confirm_password_label') }}</label>
               <Password
                 id="register-pass2"
                 v-model="confirmPassword"
@@ -170,7 +173,7 @@ const handleRegister = async () => {
 
           <div class="pt-4">
             <Button
-              label="Đăng ký ngay"
+              :label="t('register.submit')"
               fluid
               rounded
               :disabled="!canSubmit"
@@ -180,8 +183,8 @@ const handleRegister = async () => {
           </div>
 
           <p class="text-center text-sm font-medium text-slate-500">
-            Đã có tài khoản?
-            <NuxtLink to="/login" class="ml-1 font-black text-emerald-600 hover:underline">Đăng nhập</NuxtLink>
+            {{ t('register.already_have_account') }}
+            <NuxtLink :to="localePath('/login')" class="ml-1 font-black text-emerald-600 hover:underline">{{ t('register.login_link') }}</NuxtLink>
           </p>
         </div>
       </div>

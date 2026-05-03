@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { getApiErrorMessage } from '~/utils/api/errors'
 
-definePageMeta({ middleware: ['require-auth'] })
-useHead({ title: 'Thông báo' })
+const { t } = useI18n()
+const localePath = useLocalePath()
+useHead({ title: t('notifications.title') })
 
 const token = useCookie('auth_token')
 const { notifications } = useApi()
@@ -53,11 +54,11 @@ function formatTime(iso: string) {
   const now = new Date()
   const diff = now.getTime() - date.getTime()
   
-  if (diff < 60000) return 'Vừa xong'
-  if (diff < 3600000) return `${Math.floor(diff / 60000)} phút trước`
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)} giờ trước`
+  if (diff < 60000) return t('notifications.just_now')
+  if (diff < 3600000) return t('notifications.minutes_ago').replace('{n}', Math.floor(diff / 60000).toString())
+  if (diff < 86400000) return t('notifications.hours_ago').replace('{n}', Math.floor(diff / 3600000).toString())
   
-  return date.toLocaleDateString('vi-VN', {
+  return date.toLocaleDateString(t('common.vietnamese') === 'Tiếng Việt' ? 'vi-VN' : 'en-US', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
@@ -69,17 +70,17 @@ function formatTime(iso: string) {
   <div class="min-h-[100dvh] bg-slate-50 pb-28">
     <div class="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-slate-100 bg-white/80 px-4 backdrop-blur-md">
       <div class="flex items-center gap-3">
-        <NuxtLink to="/home" class="flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-slate-100">
+        <NuxtLink :to="localePath('/home')" class="flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-slate-100">
           <i class="pi pi-chevron-left text-slate-600" />
         </NuxtLink>
-        <h1 class="text-base font-bold text-slate-900">Thông báo</h1>
+        <h1 class="text-base font-bold text-slate-900">{{ t('notifications.title') }}</h1>
       </div>
       <button 
         v-if="rows?.some(n => !n.isRead)"
         @click="markAllRead"
         class="text-xs font-bold text-emerald-600 hover:underline"
       >
-        Đọc tất cả
+        {{ t('notifications.mark_all_read') }}
       </button>
     </div>
 
@@ -90,14 +91,14 @@ function formatTime(iso: string) {
 
       <div v-else-if="error" class="rounded-2xl border border-rose-100 bg-rose-50 p-4 text-center text-sm text-rose-800">
         {{ getApiErrorMessage(error) }}
-        <button @click="refresh" class="ml-2 font-bold underline">Thử lại</button>
+        <button @click="refresh" class="ml-2 font-bold underline">{{ t('notifications.retry') }}</button>
       </div>
 
       <div v-else-if="!rows?.length" class="flex flex-col items-center justify-center py-20 text-center">
         <div class="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-300">
           <i class="pi pi-bell-slash text-3xl" />
         </div>
-        <p class="mt-4 text-sm font-medium text-slate-500">Bạn chưa có thông báo nào.</p>
+        <p class="mt-4 text-sm font-medium text-slate-500">{{ t('notifications.no_notifications') }}</p>
       </div>
 
       <div v-else class="flex flex-col gap-2.5">

@@ -9,8 +9,8 @@ function parseAllowList(input: string | undefined): string[] {
 }
 
 /**
- * Cho phép vào khu vực admin (cả tổng và cửa hàng) nếu:
- * - JWT có role SUPER_ADMIN hoặc STORE_ADMIN, hoặc
+ * Cho phép vào khu vực admin nếu:
+ * - JWT có role SUPER_ADMIN, hoặc
  * - email nằm trong ADMIN_EMAILS (legacy), hoặc
  * - ADMIN_EMAILS rỗng (dev/demo): giữ hành vi cũ — mọi user đã đăng nhập đều vào được (chỉ nên dùng local).
  */
@@ -19,7 +19,7 @@ export class AdminAccessGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();
     const role = String(req?.user?.role || UserRole.USER);
-    if (role === UserRole.SUPER_ADMIN || role === UserRole.STORE_ADMIN) return true;
+    if (role === UserRole.SUPER_ADMIN) return true;
 
     const email = String(req?.user?.email || '')
       .trim()

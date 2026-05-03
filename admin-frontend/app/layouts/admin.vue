@@ -40,18 +40,11 @@ const canSuperAdmin = computed(() => {
   return false
 })
 
-const storeAdminPointLabel = computed(() => {
-  if (me.value?.role !== 'STORE_ADMIN') return ''
-  const id = me.value?.collectionPointId
-  if (!id) return 'Chưa gán điểm thu gom'
-  const p = collectionPoints.value?.find((c) => c.id === id)
-  return p?.name || id
-})
+
 
 const roleLabel = computed(() => {
   const r = me.value?.role
   if (r === 'SUPER_ADMIN') return 'Admin tổng'
-  if (r === 'STORE_ADMIN') return 'Admin cửa hàng'
   if (r === 'USER') return 'User'
   return 'Quản trị'
 })
@@ -92,15 +85,7 @@ useHead({
           />
         </div>
 
-        <div
-          v-if="me?.role === 'STORE_ADMIN'"
-          class="mb-3 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3"
-        >
-          <div class="text-[11px] font-semibold uppercase tracking-wide text-emerald-800/90">
-            Điểm thu gom của bạn
-          </div>
-          <div class="mt-1 text-sm font-semibold text-emerald-950">{{ storeAdminPointLabel }}</div>
-        </div>
+
 
         <nav class="flex flex-col gap-1">
           <NuxtLink
@@ -137,12 +122,12 @@ useHead({
           </NuxtLink>
           <NuxtLink
             v-if="canSuperAdmin"
-            to="/admin/store-admins"
+            to="/admin/admins"
             class="rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700"
             active-class="bg-emerald-50 text-emerald-700"
           >
             <i class="pi pi-id-card mr-2 text-sm" aria-hidden="true" />
-            Admin cửa hàng
+            Quản lý admin
           </NuxtLink>
           <NuxtLink
             v-if="canSuperAdmin"
@@ -151,7 +136,16 @@ useHead({
             active-class="bg-emerald-50 text-emerald-700"
           >
             <i class="pi pi-book mr-2 text-sm" aria-hidden="true" />
-            Bài đăng rác thải
+            Quản lý bài viết
+          </NuxtLink>
+          <NuxtLink
+            v-if="canSuperAdmin"
+            to="/admin/collection-points"
+            class="rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700"
+            active-class="bg-emerald-50 text-emerald-700"
+          >
+            <i class="pi pi-map-marker mr-2 text-sm" aria-hidden="true" />
+            Quản lý điểm thu gom
           </NuxtLink>
           <NuxtLink
             v-if="canSuperAdmin"
@@ -160,7 +154,7 @@ useHead({
             active-class="bg-emerald-50 text-emerald-700"
           >
             <i class="pi pi-users mr-2 text-sm" aria-hidden="true" />
-            Tất cả users
+            Quản lý user
           </NuxtLink>
         </nav>
       </aside>

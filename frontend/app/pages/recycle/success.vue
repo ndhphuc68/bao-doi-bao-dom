@@ -28,11 +28,13 @@ const deviceLine = computed(() => {
 </script>
 
 <template>
-  <div class="flex min-h-dvh min-h-0 flex-1 flex-col bg-slate-50">
+  <div class="flex min-h-dvh min-h-0 flex-1 flex-col bg-slate-50 md:justify-center md:py-12">
     <AppPageHeader title="Hoàn thành" />
 
-    <div class="flex flex-1 flex-col overflow-y-auto">
-      <div class="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-4 pt-6 sm:px-6">
+    <div class="flex flex-1 flex-col overflow-y-auto md:flex-none">
+      <div
+        class="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-4 pt-6 sm:px-6 md:max-w-2xl md:rounded-3xl md:bg-white md:p-12 md:shadow-xl md:shadow-emerald-900/5 md:ring-1 md:ring-slate-200/60"
+      >
         <!-- Icon -->
         <div class="mb-8 flex justify-center">
           <div class="relative">
@@ -89,13 +91,32 @@ const deviceLine = computed(() => {
           </p>
         </div>
 
-        <div class="min-h-6 flex-1" />
+
+        <!-- CTA Desktop -->
+        <div class="mt-10 hidden md:flex md:items-center md:justify-center md:gap-4">
+          <Button
+            label="Về trang chủ"
+            icon="pi pi-home"
+            class="!rounded-2xl !px-8 !py-3 font-semibold"
+            @click="router.push('/home')"
+          />
+          <Button
+            label="Đơn hoàn trả của tôi"
+            icon="pi pi-list"
+            severity="secondary"
+            outlined
+            class="!rounded-2xl !px-8 !py-3 font-semibold"
+            @click="router.push('/recycle')"
+          />
+        </div>
+
+        <div class="min-h-6 flex-1 md:hidden" />
       </div>
     </div>
 
     <!-- CTA -->
     <div
-      class="border-t border-slate-200/90 bg-white/95 px-5 py-5 backdrop-blur-md supports-[padding:max(0px)]:pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6"
+      class="border-t border-slate-200/90 bg-white/95 px-5 py-5 backdrop-blur-md supports-[padding:max(0px)]:pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 md:hidden"
     >
       <div class="mx-auto flex w-full max-w-md flex-col gap-2">
         <Button

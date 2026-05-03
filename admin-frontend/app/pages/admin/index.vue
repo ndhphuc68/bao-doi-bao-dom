@@ -52,6 +52,30 @@ const chartLabels = computed(() =>
 )
 const chartValues = computed(() => (stats.value?.trend ?? []).map((p) => p.count))
 
+const pieData = computed(() => {
+  if (!stats.value?.groups) return null;
+  return {
+    labels: stats.value.groups.map(g => g.label),
+    datasets: [
+      {
+        data: stats.value.groups.map(g => g.count),
+        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b'],
+        hoverBackgroundColor: ['#059669', '#2563eb', '#d97706', '#dc2626', '#7c3aed', '#475569']
+      }
+    ]
+  }
+})
+
+const pieOptions = ref({
+  plugins: {
+    legend: {
+      position: 'bottom',
+      labels: { usePointStyle: true, color: '#64748b' }
+    }
+  },
+  cutout: '60%'
+});
+
 function monthAxisLabel(ym: string) {
   if (!ym || !ym.includes('-')) return '—'
   const [y, m] = ym.split('-')
@@ -223,23 +247,9 @@ function recyclingStatusClass(st: string): string {
               @click="exportClassification"
             />
           </div>
-          <ul class="mt-6 space-y-5">
-            <li v-for="g in stats?.groups ?? []" :key="g.key">
-              <div class="flex items-center justify-between gap-3 text-sm">
-                <span class="font-medium text-slate-800">{{ g.label }}</span>
-                <span class="tabular-nums font-semibold text-slate-700">{{ g.percent }}%</span>
-              </div>
-              <div class="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100">
-                <div
-                  class="h-full rounded-full transition-all duration-500"
-                  :style="{
-                    width: `${Math.min(100, g.percent)}%`,
-                    backgroundColor: accent
-                  }"
-                />
-              </div>
-            </li>
-          </ul>
+          <div v-if="pieData" class="mt-8 flex justify-center">
+            <Chart type="doughnut" :data="pieData" :options="pieOptions" class="w-full max-w-[280px]" />
+          </div>
         </div>
       </div>
 

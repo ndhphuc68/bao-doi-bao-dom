@@ -23,7 +23,7 @@ function omitPassword<T extends User>(u: T): Omit<T, 'password'> {
 
 @Controller()
 @UseGuards(AuthGuard('jwt'), SuperAdminGuard)
-export class StoreAdminsController {
+export class AdminsController {
   constructor(
     private readonly users: UsersService,
     private readonly points: CollectionPointsService,
@@ -36,13 +36,13 @@ export class StoreAdminsController {
     return rows.map((u) => omitPassword(u));
   }
 
-  @Get('admin/store-admins')
-  async listStoreAdmins() {
-    const rows = await this.users.listStoreAdmins();
+  @Get('admin/admins')
+  async listAdmins() {
+    const rows = await this.users.listAdmins();
     return rows.map((u) => omitPassword(u));
   }
 
-  @Post('admin/store-admins')
+  @Post('admin/admins')
   async create(
     @Body()
     body: {
@@ -60,7 +60,7 @@ export class StoreAdminsController {
       const cp = await this.points.findOne(cpId);
       if (!cp) throw new BadRequestException('Invalid collection point');
     }
-    return this.users.createStoreAdmin({
+    return this.users.createAdmin({
       email: body.email,
       password: body.password,
       name: body.name?.trim() || body.email.split('@')[0],
@@ -68,7 +68,7 @@ export class StoreAdminsController {
     });
   }
 
-  @Patch('admin/store-admins/:id')
+  @Patch('admin/admins/:id')
   async update(
     @Param('id') id: string,
     @Body()

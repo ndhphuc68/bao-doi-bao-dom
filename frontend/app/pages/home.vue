@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const localePath = useLocalePath()
 definePageMeta({
   middleware: ['require-auth']
 })
@@ -7,40 +8,41 @@ const router = useRouter()
 const { wastePosts } = useApi()
 const mediaUrl = useMediaUrl()
 
+const { t } = useI18n()
 useHead({
-  title: 'Trang chủ'
+  title: t('nav.home')
 })
 
 const greeting = computed(() => {
   const h = new Date().getHours()
-  if (h >= 5 && h < 11) return 'Chào buổi sáng'
-  if (h >= 11 && h < 13) return 'Chào buổi trưa'
-  if (h >= 13 && h < 18) return 'Chào buổi chiều'
-  return 'Chào buổi tối'
+  if (h >= 5 && h < 11) return t('home.greeting_morning')
+  if (h >= 11 && h < 13) return t('home.greeting_noon')
+  if (h >= 13 && h < 18) return t('home.greeting_afternoon')
+  return t('home.greeting_evening')
 })
 
-const shortcuts = [
+const shortcuts = computed(() => [
   {
-    label: 'Tìm điểm thu gom',
+    label: t('home.shortcut_find_points'),
     icon: 'pi pi-map-marker',
     to: '/map'
   },
   {
-    label: 'Hoàn trả thiết bị',
+    label: t('home.shortcut_recycle'),
     icon: 'pi pi-sync',
     to: '/recycle'
   },
   {
-    label: 'Thiết bị hỗ trợ',
+    label: t('home.shortcut_devices'),
     icon: 'pi pi-desktop',
     to: '/devices'
   },
   {
-    label: 'Điểm thưởng',
+    label: t('home.shortcut_rewards'),
     icon: 'pi pi-star',
     to: '/rewards'
   }
-]
+])
 
 const thumbClasses = [
   'from-emerald-600/90 to-teal-800',
@@ -64,7 +66,7 @@ const { data: unreadCount } = await useAsyncData('unread_notifications_count', (
 const homeArticles = computed(() => (posts.value || []).slice(0, 4))
 
 function joinCampaign() {
-  router.push('/recycle')
+  router.push(localePath('/recycle'))
 }
 </script>
 
@@ -82,7 +84,7 @@ function joinCampaign() {
         />
         <div class="min-w-0">
           <p class="truncate text-sm font-bold leading-tight text-slate-900">
-            {{ greeting }}, Chào bạn!
+            {{ greeting }}, {{ t('home.welcome_user') }}
           </p>
           <p class="text-xs text-slate-500">Eco · Đà Nẵng</p>
         </div>
@@ -94,7 +96,7 @@ function joinCampaign() {
           text 
           severity="secondary" 
           aria-label="Thông báo" 
-          @click="router.push('/notifications')"
+          @click="router.push(localePath('/notifications'))"
         />
         <div 
           v-if="unreadCount > 0"
@@ -121,13 +123,13 @@ function joinCampaign() {
           <span
             class="mb-3 inline-block rounded-full bg-emerald-400/25 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-50 ring-1 ring-white/20"
           >
-            Chiến dịch mới
+            {{ t('home.hero_badge') }}
           </span>
           <h2 class="mb-5 max-w-[95%] text-xl font-extrabold leading-snug tracking-tight">
-            Cùng nhau giảm rác thải điện tử tại Đà Nẵng.
+            {{ t('home.hero_title') }}
           </h2>
           <Button
-            label="Tham gia ngay"
+            :label="t('home.hero_button')"
             rounded
             class="!border-0 !bg-white/20 !text-white backdrop-blur-md hover:!bg-white/30"
             @click="joinCampaign"
@@ -135,14 +137,13 @@ function joinCampaign() {
         </div>
       </div>
 
-      <!-- Lối tắt -->
       <div class="mb-6">
-        <h3 class="mb-3 text-base font-bold text-slate-900">Lối tắt nhanh</h3>
+        <h3 class="mb-3 text-base font-bold text-slate-900">{{ t('home.shortcuts_title') }}</h3>
         <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
           <NuxtLink
             v-for="item in shortcuts"
             :key="item.to"
-            :to="item.to"
+            :to="localePath(item.to)"
             v-ripple
             class="flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-4 text-center shadow-sm transition active:scale-[0.98]"
           >
@@ -159,21 +160,21 @@ function joinCampaign() {
       <!-- Tin tức từ admin -->
       <div class="mb-4">
         <div class="mb-3 flex items-center justify-between">
-          <h3 class="text-base font-bold text-slate-900">Thông tin rác thải điện tử</h3>
-          <NuxtLink to="/articles" class="text-xs font-semibold text-emerald-600"> Xem tất cả </NuxtLink>
+          <h3 class="text-base font-bold text-slate-900">{{ t('home.news_title') }}</h3>
+          <NuxtLink :to="localePath('/articles')" class="text-xs font-semibold text-emerald-600"> {{ t('home.view_all') }} </NuxtLink>
         </div>
 
         <p v-if="postsPending" class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500">
-          Đang tải bài viết…
+          {{ t('home.loading') }}
         </p>
         <p v-else-if="!homeArticles.length" class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500">
-          Chưa có bài viết. Admin sẽ cập nhật nội dung tại trang quản trị.
+          {{ t('home.no_posts') }}
         </p>
         <div v-else class="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
           <NuxtLink
             v-for="(a, i) in homeArticles"
             :key="a.id"
-            :to="`/articles/${a.id}`"
+            :to="localePath(`/articles/${a.id}`)"
             class="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm transition active:scale-[0.99]"
           >
             <div class="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-100 shadow-inner">

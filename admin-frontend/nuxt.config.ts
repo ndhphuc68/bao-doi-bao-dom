@@ -26,7 +26,7 @@ export default defineNuxtConfig({
     '/admin/returns/**': { redirect: '/admin/orders' }
   },
   modules: ['@primevue/nuxt-module', '@nuxtjs/tailwindcss', '@nuxt/icon', '@pinia/nuxt'],
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', 'quill/dist/quill.snow.css'],
   devServer: {
     host: process.env.NUXT_HOST || process.env.HOST || '127.0.0.1',
     port: Number(process.env.NUXT_PORT || process.env.PORT) || 3002
@@ -43,6 +43,9 @@ export default defineNuxtConfig({
     }
   },
   vite: {
+    optimizeDeps: {
+      include: ['chart.js', 'chart.js/auto', 'quill']
+    },
     server: {
       watch: {
         usePolling: process.env.CHOKIDAR_USEPOLLING === 'true',

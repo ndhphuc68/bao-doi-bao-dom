@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+const localePath = useLocalePath()
 import type { CollectionPointDto } from '~/types/api'
 
 definePageMeta({ middleware: ['require-auth'] })
@@ -35,7 +37,7 @@ const userPos = computed(() =>
 async function detectMyLocation() {
   locationError.value = null
   if (!('geolocation' in navigator)) {
-    locationError.value = 'Thiết bị không hỗ trợ định vị.'
+    locationError.value = t('map.not_supported')
     return
   }
   locating.value = true
@@ -50,7 +52,7 @@ async function detectMyLocation() {
       },
       (err) => {
         if (err.code === err.PERMISSION_DENIED) {
-          locationError.value = 'Bật quyền vị trí để xem điểm gần bạn trên bản đồ.'
+          locationError.value = t('map.permission_denied')
         }
         resolve()
       },
@@ -65,21 +67,21 @@ onMounted(() => {
 })
 
 function startRecycle() {
-  router.push('/recycle')
+  router.push(localePath('/recycle'))
 }
 </script>
 
 <template>
   <div class="flex min-h-[100dvh] flex-col bg-slate-50 pb-28">
-    <AppPageHeader title="Điểm thu gom" back-to="/home" />
+    <AppPageHeader :title="t('map.title')" :back-to="localePath('/home')" />
 
     <div class="flex min-h-0 flex-1 flex-col px-3 pt-2">
       <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
         <p class="text-xs text-slate-600">
-          Chấm xanh: điểm thu gom · vòng tròn xanh: bạn (nếu bật định vị)
+          {{ t('map.legend') }}
         </p>
         <Button
-          :label="locating ? 'Đang định vị…' : 'Cập nhật vị trí'"
+          :label="locating ? t('map.locating') : t('map.update_location')"
           size="small"
           rounded
           severity="secondary"
@@ -102,7 +104,7 @@ function startRecycle() {
           <LeafletMap class="absolute inset-0" :pois="pois" :user-position="userPos" :fit-bounds="true" />
           <template #fallback>
             <div class="flex h-full min-h-[280px] items-center justify-center bg-slate-100 text-sm text-slate-500">
-              Đang tải bản đồ…
+              {{ t('map.loading_map') }}
             </div>
           </template>
         </ClientOnly>
@@ -110,13 +112,13 @@ function startRecycle() {
 
       <div class="mt-4 space-y-2">
         <Button
-          label="Đặt lịch thu gom"
+          :label="t('map.start_recycle')"
           icon="pi pi-calendar-plus"
           class="w-full !rounded-2xl !py-3.5"
           @click="startRecycle"
         />
         <p class="text-center text-xs text-slate-500">
-          Chọn thiết bị và lịch trong các bước tiếp theo — bạn sẽ chọn lại điểm thu gom ở bước gần cuối.
+          {{ t('map.guide') }}
         </p>
       </div>
     </div>

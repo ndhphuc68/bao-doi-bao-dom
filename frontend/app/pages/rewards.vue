@@ -2,8 +2,9 @@
 import { useToast } from 'primevue/usetoast'
 import type { PointLedgerEntry, PointLedgerReason } from '~/types/api'
 
-definePageMeta({ middleware: ['require-auth'] })
-useHead({ title: 'Đổi thưởng' })
+const { t } = useI18n()
+const localePath = useLocalePath()
+useHead({ title: t('rewards.title') })
 
 const config = useRuntimeConfig()
 const token = useCookie('auth_token')
@@ -23,64 +24,64 @@ const {
   }
 )
 
-const hardcodedRewards = [
+const hardcodedRewards = computed(() => [
   {
     id: '1',
-    title: 'Voucher Highland 20k',
-    description: 'Áp dụng cho toàn bộ menu tại các cửa hàng Highland Coffee.',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Voucher Highland 20k' : 'Highland 20k Voucher',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Áp dụng cho toàn bộ menu tại các cửa hàng Highland Coffee.' : 'Applicable to the entire menu at Highland Coffee stores.',
     points: 200,
     image: '/images/rewards/voucher.png',
     category: 'Voucher'
   },
   {
     id: '2',
-    title: 'Túi vải Eco Friendly',
-    description: 'Túi vải Canvas chất lượng cao, bền bỉ và bảo vệ môi trường.',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Túi vải Eco Friendly' : 'Eco Friendly Tote Bag',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Túi vải Canvas chất lượng cao, bền bỉ và bảo vệ môi trường.' : 'High-quality Canvas bag, durable and eco-friendly.',
     points: 500,
     image: '/images/rewards/tote_bag.png',
-    category: 'Sản phẩm'
+    category: t('common.vietnamese') === 'Tiếng Việt' ? 'Sản phẩm' : 'Product'
   },
   {
     id: '3',
-    title: 'Bình giữ nhiệt Bao Doi',
-    description: 'Bình inox 304 cao cấp, giữ nhiệt 12h, thiết kế tối giản.',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Bình giữ nhiệt Bao Doi' : 'Bao Doi Thermos',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Bình inox 304 cao cấp, giữ nhiệt 12h, thiết kế tối giản.' : 'Premium 304 stainless steel bottle, 12h heat retention, minimalist design.',
     points: 1500,
     image: '/images/rewards/bottle.png',
-    category: 'Sản phẩm'
+    category: t('common.vietnamese') === 'Tiếng Việt' ? 'Sản phẩm' : 'Product'
   },
   {
     id: '4',
-    title: 'Mã giảm giá Grab 50k',
-    description: 'Áp dụng cho dịch vụ GrabCar hoặc GrabBike trên toàn quốc.',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Mã giảm giá Grab 50k' : 'Grab 50k Discount Code',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Áp dụng cho dịch vụ GrabCar hoặc GrabBike trên toàn quốc.' : 'Applicable to GrabCar or GrabBike services nationwide.',
     points: 1000,
     image: '/images/rewards/grab_voucher.png',
     category: 'Voucher'
   },
   {
     id: '5',
-    title: 'Sổ tay tái chế',
-    description: 'Sổ tay làm từ giấy tái chế 100%, bìa cứng kraft thân thiện.',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Sổ tay tái chế' : 'Recycled Notebook',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Sổ tay làm từ giấy tái chế 100%, bìa cứng kraft thân thiện.' : 'Notebook made from 100% recycled paper, friendly kraft hard cover.',
     points: 300,
     image: '/images/rewards/notebook.png',
-    category: 'Sản phẩm'
+    category: t('common.vietnamese') === 'Tiếng Việt' ? 'Sản phẩm' : 'Product'
   },
   {
     id: '6',
-    title: 'Bộ ống hút tre',
-    description: 'Bộ 5 ống hút tre tự nhiên kèm cọ rửa và túi vải đựng.',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Bộ ống hút tre' : 'Bamboo Straw Set',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Bộ 5 ống hút tre tự nhiên kèm cọ rửa và túi vải đựng.' : 'Natural bamboo straw set of 5 with cleaning brush and cloth bag.',
     points: 150,
     image: '/images/rewards/straws.png',
-    category: 'Sản phẩm'
+    category: t('common.vietnamese') === 'Tiếng Việt' ? 'Sản phẩm' : 'Product'
   }
-]
+])
 
 async function handleRedeem(reward: any) {
   const currentPoints = summary.value?.points ?? 0
   if (currentPoints < reward.points) {
     toast.add({
       severity: 'warn',
-      summary: 'Không đủ điểm',
-      detail: 'Bạn cần tích lũy thêm điểm để đổi quà này.',
+      summary: t('rewards.insufficient_points'),
+      detail: t('rewards.insufficient_detail'),
       life: 3000
     })
     return
@@ -94,8 +95,8 @@ async function handleRedeem(reward: any) {
 
     toast.add({
       severity: 'success',
-      summary: 'Đổi quà thành công',
-      detail: `Bạn đã đổi thành công ${reward.title}. Kiểm tra email để nhận mã!`,
+      summary: t('rewards.redeem_success'),
+      detail: t('rewards.redeem_success_detail').replace('{reward}', reward.title),
       life: 5000
     })
 
@@ -110,8 +111,8 @@ async function handleRedeem(reward: any) {
   } catch (err) {
     toast.add({
       severity: 'error',
-      summary: 'Lỗi',
-      detail: 'Không thể thực hiện đổi quà. Vui lòng thử lại sau.',
+      summary: t('rewards.redeem_fail'),
+      detail: t('rewards.redeem_fail_detail'),
       life: 3500
     })
   }
@@ -119,16 +120,16 @@ async function handleRedeem(reward: any) {
 
 function reasonLabel(reason: PointLedgerReason): string {
   const map: Record<PointLedgerReason, string> = {
-    SIGNUP: 'Thưởng đăng ký tài khoản',
-    ORDER_APPROVED: 'Đơn được admin xác nhận',
-    REDEEM: 'Đổi quà tặng'
+    SIGNUP: t('rewards.reason_signup'),
+    ORDER_APPROVED: t('rewards.reason_order'),
+    REDEEM: t('rewards.reason_redeem')
   }
   return map[reason] ?? reason
 }
 
 function formatWhen(iso: string): string {
   try {
-    return new Date(iso).toLocaleString('vi-VN', {
+    return new Date(iso).toLocaleString(t('common.vietnamese') === 'Tiếng Việt' ? 'vi-VN' : 'en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -142,7 +143,7 @@ function formatWhen(iso: string): string {
 
 function orderHint(entry: PointLedgerEntry): string | null {
   if (entry.reason === 'ORDER_APPROVED' && entry.trackingCode) {
-    return `Mã vận đơn: ${entry.trackingCode}`
+    return `${t('rewards.tracking_code')}: ${entry.trackingCode}`
   }
   return null
 }
@@ -150,10 +151,10 @@ function orderHint(entry: PointLedgerEntry): string | null {
 
 <template>
   <div class="min-h-[100dvh] bg-slate-50 pb-28">
-    <AppPageHeader title="Điểm thưởng" />
+    <AppPageHeader :title="t('rewards.title')" />
     <div class="hidden md:block px-8 py-6">
-      <h1 class="text-2xl font-extrabold text-slate-900">Ưu đãi & Điểm thưởng</h1>
-      <p class="text-sm text-slate-500">Tích lũy điểm xanh và đổi những phần quà hấp dẫn từ Eco</p>
+      <h1 class="text-2xl font-extrabold text-slate-900">{{ t('rewards.header_title') }}</h1>
+      <p class="text-sm text-slate-500">{{ t('rewards.header_subtitle') }}</p>
     </div>
 
     <div class="px-5 pt-4">
@@ -163,21 +164,21 @@ function orderHint(entry: PointLedgerEntry): string | null {
       >
         <div class="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/10" aria-hidden="true" />
         <div class="absolute -bottom-10 left-1/3 h-24 w-24 rounded-full bg-white/5" aria-hidden="true" />
-        <p class="text-xs font-bold uppercase tracking-wider text-emerald-100/90">Điểm xanh hiện có</p>
+        <p class="text-xs font-bold uppercase tracking-wider text-emerald-100/90">{{ t('rewards.current_points') }}</p>
         <p v-if="pending" class="mt-2 text-4xl font-black tabular-nums">…</p>
         <p v-else class="mt-2 text-4xl font-black tabular-nums">
           {{ summary?.points ?? 0 }}
         </p>
         <p class="mt-2 text-sm text-emerald-50/95">
-          Tích điểm khi đăng ký và khi đơn hoàn trả được cửa hàng xác nhận.
+          {{ t('rewards.points_desc') }}
         </p>
       </div>
 
       <!-- Redemption Section -->
       <div class="mt-8">
         <div class="flex items-center justify-between">
-          <h2 class="text-base font-extrabold text-slate-900">Đổi quà hấp dẫn</h2>
-          <NuxtLink to="#" class="text-xs font-bold text-emerald-600 hover:underline">Xem tất cả</NuxtLink>
+          <h2 class="text-base font-extrabold text-slate-900">{{ t('rewards.redeem_title') }}</h2>
+          <NuxtLink to="#" class="text-xs font-bold text-emerald-600 hover:underline">{{ t('rewards.view_all') }}</NuxtLink>
         </div>
         
         <div class="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
@@ -194,19 +195,19 @@ function orderHint(entry: PointLedgerEntry): string | null {
 
       <!-- History Section -->
       <div class="mt-8 pb-4">
-        <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Lịch sử cộng điểm</h2>
+        <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">{{ t('rewards.history_title') }}</h2>
 
         <div
           v-if="error"
           class="mt-3 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800"
         >
-          Không tải được lịch sử. Thử lại sau.
+          {{ t('rewards.error_history') }}
           <button
             type="button"
             class="ml-2 font-bold underline"
             @click="() => refresh()"
           >
-            Tải lại
+            {{ t('rewards.retry') }}
           </button>
         </div>
 
@@ -214,7 +215,7 @@ function orderHint(entry: PointLedgerEntry): string | null {
           v-else-if="!pending && (!summary?.entries?.length)"
           class="mt-4 rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center text-sm text-slate-500"
         >
-          Chưa có giao dịch điểm. Lịch sử sẽ hiện sau khi bạn nhận thưởng hoặc đơn được xác nhận.
+          {{ t('rewards.no_transactions') }}
         </div>
 
         <ul v-else class="mt-3 flex flex-col gap-2">
@@ -242,7 +243,7 @@ function orderHint(entry: PointLedgerEntry): string | null {
               >
                 {{ e.amount > 0 ? '+' : '' }}{{ e.amount }}
               </p>
-              <p class="text-[10px] font-semibold uppercase text-slate-400">điểm</p>
+              <p class="text-[10px] font-semibold uppercase text-slate-400">{{ t('rewards.points_unit') }}</p>
             </div>
           </li>
         </ul>

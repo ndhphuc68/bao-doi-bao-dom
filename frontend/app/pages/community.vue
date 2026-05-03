@@ -1,6 +1,7 @@
 <script setup lang="ts">
-definePageMeta({ middleware: ['require-auth'] })
-useHead({ title: 'Cộng đồng' })
+const { t } = useI18n()
+const localePath = useLocalePath()
+useHead({ title: t('community.title') })
 
 const token = useCookie('auth_token')
 const { community } = useApi()
@@ -23,7 +24,7 @@ function getRankBg(index: number) {
 
 function formatTime(iso: string) {
   const date = new Date(iso)
-  return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+  return date.toLocaleDateString(t('common.vietnamese') === 'Tiếng Việt' ? 'vi-VN' : 'en-US', { day: '2-digit', month: '2-digit' })
 }
 </script>
 
@@ -32,27 +33,27 @@ function formatTime(iso: string) {
     <!-- Header -->
     <div class="sticky top-0 z-20 bg-emerald-600 px-5 pb-10 pt-4 text-white shadow-lg md:hidden">
       <div class="flex items-center justify-between">
-        <h1 class="text-xl font-extrabold tracking-tight">Cộng đồng Eco</h1>
-        <NuxtLink to="/rewards" class="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold backdrop-blur-md">
+        <h1 class="text-xl font-extrabold tracking-tight">{{ t('community.title') }}</h1>
+        <NuxtLink :to="localePath('/rewards')" class="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold backdrop-blur-md">
           <i class="pi pi-star-fill text-amber-300" />
-          Đổi thưởng
+          {{ t('community.redeem') }}
         </NuxtLink>
       </div>
-      <p class="mt-2 text-xs font-medium text-emerald-100 opacity-90">Cùng nhau kiến tạo một tương lai xanh hơn.</p>
+      <p class="mt-2 text-xs font-medium text-emerald-100 opacity-90">{{ t('community.subtitle') }}</p>
       
       <!-- Impact Stats -->
       <div class="mt-6 grid grid-cols-3 gap-3">
         <div class="flex flex-col items-center rounded-2xl bg-white/10 p-3 text-center backdrop-blur-sm">
           <span class="text-lg font-black">{{ stats?.totalDevices || 0 }}</span>
-          <span class="text-[10px] font-bold uppercase opacity-80">Thiết bị</span>
+          <span class="text-[10px] font-bold uppercase opacity-80">{{ t('community.stat_devices') }}</span>
         </div>
         <div class="flex flex-col items-center rounded-2xl bg-white/10 p-3 text-center backdrop-blur-sm">
           <span class="text-lg font-black">{{ stats?.co2Saved?.toFixed(1) || 0 }}kg</span>
-          <span class="text-[10px] font-bold uppercase opacity-80">CO2 Giảm</span>
+          <span class="text-[10px] font-bold uppercase opacity-80">{{ t('community.stat_co2') }}</span>
         </div>
         <div class="flex flex-col items-center rounded-2xl bg-white/10 p-3 text-center backdrop-blur-sm">
           <span class="text-lg font-black">{{ stats?.totalUsers || 0 }}</span>
-          <span class="text-[10px] font-bold uppercase opacity-80">Eco-ers</span>
+          <span class="text-[10px] font-bold uppercase opacity-80">{{ t('community.stat_users') }}</span>
         </div>
       </div>
     </div>
@@ -61,20 +62,20 @@ function formatTime(iso: string) {
     <div class="hidden md:block px-8 py-6">
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h1 class="text-2xl font-extrabold text-slate-900">Cộng đồng Eco</h1>
-          <p class="text-sm text-slate-500">Cùng nhau kiến tạo một tương lai xanh hơn tại Đà Nẵng</p>
+          <h1 class="text-2xl font-extrabold text-slate-900">{{ t('community.title') }}</h1>
+          <p class="text-sm text-slate-500">{{ t('community.subtitle') }}</p>
         </div>
         <div class="flex gap-4">
           <div class="bg-white px-6 py-4 rounded-3xl border border-slate-100 shadow-sm text-center min-w-[140px]">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Thiết bị</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{{ t('community.stat_devices') }}</p>
             <p class="text-2xl font-black text-emerald-600">{{ stats?.totalDevices || 0 }}</p>
           </div>
           <div class="bg-white px-6 py-4 rounded-3xl border border-slate-100 shadow-sm text-center min-w-[140px]">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">CO2 Giảm</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{{ t('community.stat_co2') }}</p>
             <p class="text-2xl font-black text-emerald-600">{{ stats?.co2Saved?.toFixed(1) || 0 }}kg</p>
           </div>
           <div class="bg-white px-6 py-4 rounded-3xl border border-slate-100 shadow-sm text-center min-w-[140px]">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Eco-ers</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{{ t('community.stat_users') }}</p>
             <p class="text-2xl font-black text-emerald-600">{{ stats?.totalUsers || 0 }}</p>
           </div>
         </div>
@@ -85,7 +86,7 @@ function formatTime(iso: string) {
       <!-- Activity Feed -->
       <div class="mb-8">
         <div class="mb-4 flex items-center justify-between px-1">
-          <h2 class="text-base font-extrabold text-slate-900 uppercase tracking-wide">Hành động xanh mới</h2>
+          <h2 class="text-base font-extrabold text-slate-900 uppercase tracking-wide">{{ t('community.recent_actions') }}</h2>
           <i class="pi pi-bolt text-emerald-500 animate-pulse" />
         </div>
         <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
@@ -99,17 +100,17 @@ function formatTime(iso: string) {
             </div>
             <div class="min-w-0">
               <p class="truncate text-xs font-bold text-slate-800">{{ item.userName }}</p>
-              <p class="truncate text-[10px] text-slate-500">vừa thu hồi {{ item.deviceType }}</p>
+              <p class="truncate text-[10px] text-slate-500">{{ t('community.just_returned') }} {{ item.deviceType }}</p>
             </div>
           </div>
-          <div v-if="!feed?.length" class="w-full py-4 text-center text-xs text-slate-400">Chưa có hành động mới.</div>
+          <div v-if="!feed?.length" class="w-full py-4 text-center text-xs text-slate-400">{{ t('community.no_actions') }}</div>
         </div>
       </div>
 
       <!-- Leaderboard -->
       <div class="mb-4 flex items-center justify-between px-1">
-        <h2 class="text-base font-extrabold text-slate-900 uppercase tracking-wide">Bảng xếp hạng</h2>
-        <span class="text-[10px] font-bold text-slate-400">Top 10 Eco-ers</span>
+        <h2 class="text-base font-extrabold text-slate-900 uppercase tracking-wide">{{ t('community.leaderboard_title') }}</h2>
+        <span class="text-[10px] font-bold text-slate-400">{{ t('community.top_10') }}</span>
       </div>
 
       <div class="space-y-2.5">
@@ -124,16 +125,16 @@ function formatTime(iso: string) {
           </div>
           <div class="flex-1 min-w-0">
             <p class="truncate text-sm font-bold text-slate-900">{{ user.name }}</p>
-            <p class="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">Hiệp sĩ xanh</p>
+            <p class="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">{{ t('community.green_knight') }}</p>
           </div>
           <div class="text-right">
             <p class="text-sm font-black text-slate-900">{{ user.points }}</p>
-            <p class="text-[10px] font-bold text-slate-400">ĐIỂM</p>
+            <p class="text-[10px] font-bold text-slate-400">{{ t('community.points_unit') }}</p>
           </div>
         </div>
         
         <div v-if="!leaderboard?.length" class="py-10 text-center text-sm text-slate-400">
-          Đang tải bảng xếp hạng...
+          {{ t('community.loading_leaderboard') }}
         </div>
       </div>
     </div>

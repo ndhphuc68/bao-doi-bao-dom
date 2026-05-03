@@ -1,5 +1,5 @@
 /** Vai trò tài khoản (khớp backend `User.role`) */
-export type UserRole = 'USER' | 'SUPER_ADMIN' | 'STORE_ADMIN'
+export type UserRole = 'USER' | 'SUPER_ADMIN'
 
 /** Bài đăng rác thải điện tử (API công khai GET /waste-posts) */
 export interface WastePostDto {

@@ -32,15 +32,15 @@ export class UsersService {
     });
   }
 
-  async listStoreAdmins(): Promise<User[]> {
+  async listAdmins(): Promise<User[]> {
     return this.usersRepository.find({
-      where: { role: UserRole.STORE_ADMIN },
+      where: { role: UserRole.SUPER_ADMIN },
       order: { createdAt: 'DESC' },
       relations: ['collectionPoint'],
     });
   }
 
-  async createStoreAdmin(data: {
+  async createAdmin(data: {
     email: string;
     password: string;
     name: string;
@@ -55,7 +55,7 @@ export class UsersService {
       password: hashed,
       name: data.name.trim(),
       collectionPointId: data.collectionPointId ?? null,
-      role: UserRole.STORE_ADMIN,
+      role: UserRole.SUPER_ADMIN,
       points: 0,
     });
     const { password: _p, ...rest } = created;

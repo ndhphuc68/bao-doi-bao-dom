@@ -10,7 +10,6 @@ function parseAllowList(input: string | undefined): string[] {
 
 /**
  * Chỉ admin tổng (SUPER_ADMIN) hoặc email trong SUPER_ADMIN_EMAILS / ADMIN_EMAILS (legacy).
- * Admin cửa hàng (STORE_ADMIN) không được truy cập.
  */
 @Injectable()
 export class SuperAdminGuard implements CanActivate {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useI18n()
 defineProps<{
   reward: {
     id: string
@@ -33,14 +34,14 @@ defineEmits(['redeem'])
       <div class="mt-4 flex items-center justify-between">
         <div class="flex items-center gap-1">
           <span class="text-base font-black text-emerald-600 tabular-nums">{{ reward.points }}</span>
-          <span class="text-[10px] font-bold uppercase text-slate-400">điểm</span>
+          <span class="text-[10px] font-bold uppercase text-slate-400">{{ t('rewards.points_unit') }}</span>
         </div>
         <button
           type="button"
           class="rounded-xl bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-100 active:scale-95"
           @click="$emit('redeem', reward)"
         >
-          Đổi quà
+          {{ t('rewards.redeem_button') }}
         </button>
       </div>
     </div>

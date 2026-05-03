@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { formatOrderCreated, userOrderStatusClass, userOrderStatusLabel } from '~/utils/recycling-order-display'
 
+const { t } = useI18n()
+const localePath = useLocalePath()
+
 definePageMeta({ middleware: ['require-auth'] })
 
 const router = useRouter()
@@ -18,26 +21,26 @@ const { data: orders, pending, error, refresh } = await useAsyncData(
 )
 
 function goNewRequest() {
-  router.push('/recycle/step-1')
+  router.push(localePath('/recycle/step-1'))
 }
 </script>
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col bg-slate-50">
-    <AppPageHeader title="Hoàn trả" back-to="/home" />
+    <AppPageHeader :title="t('recycle.title')" :back-to="localePath('/home')" />
     <div class="hidden md:block px-8 py-6">
-      <h1 class="text-2xl font-extrabold text-slate-900">Hoàn trả thiết bị</h1>
-      <p class="text-sm text-slate-500">Quản lý các đơn hoàn trả và đặt lịch thu gom mới</p>
+      <h1 class="text-2xl font-extrabold text-slate-900">{{ t('recycle.header_title') }}</h1>
+      <p class="text-sm text-slate-500">{{ t('recycle.header_subtitle') }}</p>
     </div>
 
     <div class="flex-1 overflow-y-auto px-4 pb-28 pt-2">
       <div class="mb-5 rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 px-5 py-5 text-white shadow-lg shadow-emerald-900/15">
-        <p class="text-sm font-semibold text-emerald-50/95">Tạo yêu cầu mới</p>
+        <p class="text-sm font-semibold text-emerald-50/95">{{ t('recycle.new_request') }}</p>
         <p class="mt-1 text-xs leading-relaxed text-emerald-100/90">
-          Đặt lịch thu gom thiết bị điện tử tại điểm thu gần bạn.
+          {{ t('recycle.new_desc') }}
         </p>
         <Button
-          label="Tạo đơn hoàn trả"
+          :label="t('recycle.create_button')"
           icon="pi pi-plus"
           class="mt-4 !w-full !rounded-2xl !border-0 !bg-white !py-3 !font-bold !text-emerald-800"
           @click="goNewRequest"
@@ -45,30 +48,30 @@ function goNewRequest() {
       </div>
 
       <div class="mb-3 flex items-center justify-between">
-        <h2 class="text-base font-bold text-slate-900">Đơn của tôi</h2>
+        <h2 class="text-base font-bold text-slate-900">{{ t('recycle.my_orders') }}</h2>
         <button
           type="button"
           class="text-xs font-semibold text-emerald-600 active:opacity-80"
           @click="refresh"
         >
-          Làm mới
+          {{ t('recycle.refresh') }}
         </button>
       </div>
 
-      <div v-if="pending" class="py-12 text-center text-sm text-slate-500">Đang tải…</div>
+      <div v-if="pending" class="py-12 text-center text-sm text-slate-500">{{ t('recycle.loading') }}</div>
       <div
         v-else-if="error"
         class="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800"
       >
-        Không tải được danh sách. Thử lại sau.
+        {{ t('recycle.error_loading') }}
       </div>
       <div
         v-else-if="!orders?.length"
         class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center"
       >
-        <p class="text-sm text-slate-600">Bạn chưa có đơn hoàn trả nào.</p>
+        <p class="text-sm text-slate-600">{{ t('recycle.no_orders') }}</p>
         <Button
-          label="Tạo đơn đầu tiên"
+          :label="t('recycle.create_first')"
           icon="pi pi-sync"
           class="mt-4 !rounded-2xl"
           @click="goNewRequest"
@@ -78,7 +81,7 @@ function goNewRequest() {
         <NuxtLink
           v-for="o in orders"
           :key="o.id"
-          :to="`/profile/returns/${o.id}?from=recycle`"
+          :to="localePath(`/profile/returns/${o.id}?from=recycle`)"
           class="block rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm transition active:scale-[0.99] hover:border-emerald-200"
         >
           <div class="flex items-start justify-between gap-2">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const localePath = useLocalePath()
 const config = useRuntimeConfig()
 const token = useCookie('auth_token')
 const router = useRouter()
@@ -17,13 +18,21 @@ const { data: unreadCount } = await useAsyncData('desktop_unread_notifications',
   token.value ? useApi().notifications.unreadCount(token.value) : Promise.resolve(0)
 )
 
-const navLinks = [
-  { to: '/home', label: 'Trang chủ', icon: 'pi pi-home' },
-  { to: '/recycle', label: 'Hoàn trả', icon: 'pi pi-sync' },
-  { to: '/community', label: 'Cộng đồng', icon: 'pi pi-users' },
-  { to: '/rewards', label: 'Ưu đãi', icon: 'pi pi-gift' },
-  { to: '/profile', label: 'Hồ sơ', icon: 'pi pi-user' }
-]
+const { t, locale, setLocale } = useI18n()
+
+const navLinks = computed(() => [
+  { to: '/home', label: t('nav.home'), icon: 'pi pi-home' },
+  { to: '/recycle', label: t('nav.recycle'), icon: 'pi pi-sync' },
+  { to: '/community', label: t('nav.community'), icon: 'pi pi-users' },
+  { to: '/rewards', label: t('nav.rewards'), icon: 'pi pi-gift' },
+  { to: '/profile', label: t('nav.profile'), icon: 'pi pi-user' }
+])
+
+const currentLocaleName = computed(() => locale.value === 'vi' ? 'VI' : 'EN')
+
+function toggleLanguage() {
+  setLocale(locale.value === 'vi' ? 'en' : 'vi')
+}
 
 function isActive(path: string) {
   if (path === '/home') return route.path === '/home'
@@ -33,7 +42,7 @@ function isActive(path: string) {
 
 function logout() {
   token.value = null
-  router.push('/login')
+  router.push(localePath('/login'))
 }
 </script>
 
@@ -41,13 +50,13 @@ function logout() {
   <header class="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/80 backdrop-blur-xl">
     <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
       <!-- Logo & Branding -->
-      <NuxtLink to="/home" class="flex items-center gap-3 group">
+      <NuxtLink :to="localePath('/home')" class="flex items-center gap-3 group">
         <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200 transition-transform group-hover:scale-105">
           <img src="/logo_splash.png" alt="Eco Logo" class="h-full w-full object-contain" />
         </div>
         <div class="flex flex-col">
           <span class="text-xl font-black leading-none tracking-tighter text-emerald-600 sm:block">Eco</span>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Tái chế</span>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">{{ t('nav.recycle') }}</span>
         </div>
       </NuxtLink>
 
@@ -56,7 +65,7 @@ function logout() {
         <NuxtLink
           v-for="link in navLinks"
           :key="link.to"
-          :to="link.to"
+          :to="localePath(link.to)"
           class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all"
           :class="
             isActive(link.to)
@@ -73,8 +82,22 @@ function logout() {
       <div class="flex items-center gap-3 lg:gap-5">
         <div class="hidden items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 ring-1 ring-emerald-100 sm:flex">
           <i class="pi pi-star-fill text-amber-500" />
-          <span class="text-sm font-bold text-emerald-800">{{ profile?.points ?? 0 }} <span class="hidden lg:inline">điểm</span></span>
+          <span class="text-sm font-bold text-emerald-800">{{ profile?.points ?? 0 }} <span class="hidden lg:inline">{{ t('common.points') }}</span></span>
         </div>
+
+        <!-- Language Switcher -->
+        <Button
+          text
+          severity="secondary"
+          class="!px-2 !py-1 !min-w-[44px] !h-10 !font-bold !text-xs !rounded-xl border border-slate-200"
+          @click="toggleLanguage"
+        >
+          <div class="flex items-center gap-1.5">
+            <span :class="locale === 'vi' ? 'text-emerald-600' : 'text-slate-400'">VI</span>
+            <div class="h-3 w-px bg-slate-300" />
+            <span :class="locale === 'en' ? 'text-emerald-600' : 'text-slate-400'">EN</span>
+          </div>
+        </Button>
 
         <div class="relative">
           <Button
@@ -83,7 +106,7 @@ function logout() {
             text
             severity="secondary"
             class="!h-10 !w-10"
-            @click="router.push('/notifications')"
+            @click="router.push(localePath('/notifications'))"
           />
           <div
             v-if="unreadCount > 0"
@@ -97,7 +120,7 @@ function logout() {
 
         <Button
           icon="pi pi-sign-out"
-          label="Đăng xuất"
+          :label="t('auth.logout')"
           severity="secondary"
           text
           class="!hidden !text-xs !font-bold lg:!flex"

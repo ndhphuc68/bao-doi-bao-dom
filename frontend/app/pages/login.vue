@@ -3,10 +3,13 @@ import { ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { getApiErrorMessage } from '~/utils/api/errors'
 
+const { t } = useI18n()
+const localePath = useLocalePath()
+
 definePageMeta({
   middleware: ['redirect-if-logged-in']
 })
-useHead({ title: 'Đăng nhập' })
+useHead({ title: t('login.title') })
 
 const email = ref('')
 const password = ref('')
@@ -20,10 +23,10 @@ const handleLogin = async () => {
 
     const token = useCookie('auth_token')
     token.value = res.access_token
-    toast.add({ severity: 'success', summary: 'Thành công', detail: 'Đăng nhập thành công!', life: 2500 })
-    router.push('/home')
+    toast.add({ severity: 'success', summary: t('common.vietnamese') === 'Tiếng Việt' ? 'Thành công' : 'Success', detail: t('login.success'), life: 2500 })
+    router.push(localePath('/home'))
   } catch (err) {
-    toast.add({ severity: 'error', summary: 'Đăng nhập thất bại', detail: getApiErrorMessage(err), life: 3500 })
+    toast.add({ severity: 'error', summary: t('login.fail'), detail: getApiErrorMessage(err), life: 3500 })
   }
 }
 </script>
@@ -41,19 +44,19 @@ const handleLogin = async () => {
         <div class="mb-8 rounded-3xl bg-white p-5 shadow-2xl shadow-emerald-500/20 transition-transform hover:scale-105">
           <img src="/logo_splash.png" alt="Eco Logo" class="h-24 w-24 object-contain" />
         </div>
-        <h2 class="mb-4 text-4xl font-black tracking-tight lg:text-5xl">Kiến tạo tương lai xanh.</h2>
+        <h2 class="mb-4 text-4xl font-black tracking-tight lg:text-5xl">{{ t('login.hero_title') }}</h2>
         <p class="max-w-md text-lg font-medium text-emerald-50/80">
-          Tham gia cùng cộng đồng Eco tại Đà Nẵng để giảm thiểu rác thải điện tử và nhận những phần quà ý nghĩa.
+          {{ t('login.hero_subtitle') }}
         </p>
         
         <div class="mt-12 grid grid-cols-2 gap-12">
           <div class="text-left">
             <p class="text-4xl font-black text-emerald-400">1.2k+</p>
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-100/60">Thiết bị thu hồi</p>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-100/60">{{ t('login.stat_devices') }}</p>
           </div>
           <div class="text-left">
             <p class="text-4xl font-black text-emerald-400">500kg</p>
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-100/60">CO2 giảm thiểu</p>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-100/60">{{ t('login.stat_co2') }}</p>
           </div>
         </div>
       </div>
@@ -70,20 +73,20 @@ const handleLogin = async () => {
         </div>
 
         <div class="text-center md:text-left">
-          <h1 class="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">Đăng nhập</h1>
-          <p class="mt-2 text-sm font-medium text-slate-500">Tiếp tục hành trình bảo vệ hành tinh cùng Eco.</p>
+          <h1 class="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">{{ t('login.title') }}</h1>
+          <p class="mt-2 text-sm font-medium text-slate-500">{{ t('login.subtitle') }}</p>
         </div>
 
         <div class="space-y-6">
           <div class="space-y-2">
-            <label for="login-email" class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-1">Tài khoản</label>
+            <label for="login-email" class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-1">{{ t('login.email_label') }}</label>
             <IconField>
               <InputIcon class="pi pi-envelope !text-slate-400" />
               <InputText
                 id="login-email"
                 v-model="email"
                 type="email"
-                placeholder="Email hoặc số điện thoại"
+                :placeholder="t('login.email_placeholder')"
                 fluid
                 class="!rounded-2xl !py-4 !pl-12 !border-slate-100 !bg-slate-50/50 hover:!bg-white focus:!bg-white focus:!ring-emerald-500/20"
               />
@@ -91,7 +94,7 @@ const handleLogin = async () => {
           </div>
 
           <div class="space-y-2">
-            <label for="login-pass" class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-1">Mật khẩu</label>
+            <label for="login-pass" class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-1">{{ t('login.password_label') }}</label>
             <Password
               id="login-pass"
               v-model="password"
@@ -102,13 +105,13 @@ const handleLogin = async () => {
               input-class="!rounded-2xl !py-4 !border-slate-100 !bg-slate-50/50 hover:!bg-white focus:!bg-white"
             />
             <div class="flex justify-end pt-1">
-              <Button label="Quên mật khẩu?" link class="!p-0 !text-xs !font-bold !text-slate-400 hover:!text-emerald-600" severity="secondary" />
+              <Button :label="t('login.forgot_password')" link class="!p-0 !text-xs !font-bold !text-slate-400 hover:!text-emerald-600" severity="secondary" />
             </div>
           </div>
 
           <div class="pt-2">
             <Button
-              label="Đăng nhập"
+              :label="t('login.submit')"
               fluid
               rounded
               class="!py-4 !text-base !font-black shadow-xl shadow-emerald-500/20"
@@ -121,13 +124,13 @@ const handleLogin = async () => {
               <div class="w-full border-t border-slate-100"></div>
             </div>
             <div class="relative flex justify-center text-xs font-black uppercase tracking-widest">
-              <span class="bg-white px-4 text-slate-300">hoặc tham gia</span>
+              <span class="bg-white px-4 text-slate-300">{{ t('login.or_join') }}</span>
             </div>
           </div>
 
           <p class="text-center text-sm font-medium text-slate-500">
-            Bạn mới biết đến Eco?
-            <NuxtLink to="/register" class="ml-1 font-black text-emerald-600 hover:underline">Đăng ký ngay</NuxtLink>
+            {{ t('login.new_to_eco') }}
+            <NuxtLink :to="localePath('/register')" class="ml-1 font-black text-emerald-600 hover:underline">{{ t('login.register_now') }}</NuxtLink>
           </p>
         </div>
       </div>

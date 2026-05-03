@@ -27,6 +27,19 @@ const { data: rows, pending, refresh } = await useAsyncData('admin_all_users', (
   })
 )
 
+const searchQuery = ref('')
+
+const filteredRows = computed(() => {
+  if (!rows.value) return []
+  const q = searchQuery.value.toLowerCase().trim()
+  if (!q) return rows.value
+  return rows.value.filter(u => 
+    u.email.toLowerCase().includes(q) || 
+    u.name.toLowerCase().includes(q) || 
+    (u.phoneNumber && u.phoneNumber.includes(q))
+  )
+})
+
 // Edit User
 const editDialog = ref(false)
 const editingUser = ref<Partial<UserRow>>({})
@@ -120,20 +133,54 @@ function getReasonLabel(reason: string) {
 function formatDate(d: string) {
   return new Date(d).toLocaleString('vi-VN')
 }
+
+const exportCSV = () => {
+  if (!rows.value || rows.value.length === 0) {
+    toast.add({ severity: 'info', summary: 'Trống', detail: 'Không có dữ liệu để xuất', life: 3000 })
+    return
+  }
+  const headers = ['Email', 'Tên', 'SĐT', 'Điểm', 'Vai trò']
+  const csvContent = [
+    headers.join(','),
+    ...rows.value.map(u => [u.email, `"${u.name}"`, u.phoneNumber || '', u.points, u.role].join(','))
+  ].join('\n')
+
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute('download', `users_export_${new Date().getTime()}.csv`)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <Toast />
     
-    <div>
-      <h1 class="text-xl font-bold tracking-tight">Tất cả users</h1>
-      <p class="text-sm text-slate-600">Danh sách người dùng (admin tổng).</p>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">Quản lý User</h1>
+        <p class="text-sm text-slate-600">Danh sách người dùng hệ thống.</p>
+      </div>
+      <Button icon="pi pi-download" label="Xuất CSV" outlined size="small" class="!rounded-xl" @click="exportCSV" />
+    </div>
+
+    <!-- Filters -->
+    <div class="flex items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+      <IconField class="w-full max-w-[400px]">
+        <InputIcon class="pi pi-search text-slate-400" />
+        <InputText v-model="searchQuery" placeholder="Tìm theo tên, email hoặc SĐT..." class="w-full rounded-xl !bg-slate-50/50" />
+      </IconField>
     </div>
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <div v-if="pending" class="p-4 text-sm text-slate-500 italic">Đang tải dữ liệu…</div>
-      <div v-else-if="!rows?.length" class="p-4 text-sm text-slate-500">Không có dữ liệu.</div>
+      <div v-else-if="!filteredRows?.length" class="p-12 flex flex-col items-center justify-center text-center">
+        <i class="pi pi-users text-4xl text-slate-200 mb-3" />
+        <p class="text-sm font-medium text-slate-500">Không tìm thấy người dùng nào.</p>
+      </div>
       <div v-else class="overflow-auto">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
           <thead class="bg-slate-50">
@@ -146,7 +193,7 @@ function formatDate(d: string) {
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            <tr v-for="u in rows" :key="u.id" class="hover:bg-slate-50 transition-colors">
+            <tr v-for="u in filteredRows" :key="u.id" class="hover:bg-slate-50 transition-colors">
               <td class="px-4 py-3 font-medium">{{ u.email }}</td>
               <td class="px-4 py-3 text-slate-700">{{ u.name }}</td>
               <td class="px-4 py-3 text-slate-500 font-mono text-xs">{{ u.phoneNumber || '—' }}</td>

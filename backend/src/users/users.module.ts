@@ -4,12 +4,12 @@ import { User } from './user.entity';
 import { UserPointLedger } from './user-point-ledger.entity';
 import { UsersService } from './users.service';
 import { UserPointLedgerService } from './user-point-ledger.service';
-import { StoreAdminsController } from './store-admins.controller';
+import { AdminsController } from './admins.controller';
 import { CollectionPointsModule } from '../collection-points/collection-points.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, UserPointLedger]), CollectionPointsModule],
-  controllers: [StoreAdminsController],
+  controllers: [AdminsController],
   providers: [UsersService, UserPointLedgerService],
   exports: [UsersService, UserPointLedgerService],
 })

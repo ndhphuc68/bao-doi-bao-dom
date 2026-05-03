@@ -11,7 +11,22 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:3001'
     }
   },
-  modules: ['@primevue/nuxt-module', '@vite-pwa/nuxt', '@nuxtjs/tailwindcss', '@nuxt/icon', '@pinia/nuxt'],
+  modules: ['@primevue/nuxt-module', '@vite-pwa/nuxt', '@nuxtjs/tailwindcss', '@nuxt/icon', '@pinia/nuxt', '@nuxtjs/i18n'],
+  i18n: {
+    locales: [
+      { code: 'vi', name: 'Tiếng Việt', file: 'vi.json' },
+      { code: 'en', name: 'English', file: 'en.json' }
+    ],
+    defaultLocale: 'vi',
+    lazy: true,
+    langDir: '../i18n/locales/',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root'
+    }
+  },
   css: ['leaflet/dist/leaflet.css', '~/assets/css/main.css'],
   devServer: {
     host: process.env.NUXT_HOST || process.env.HOST || '127.0.0.1',

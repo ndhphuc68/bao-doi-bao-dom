@@ -17,7 +17,7 @@ const handleLogin = async () => {
   try {
     const res = await apiFetch<{ access_token: string }>('/auth/login', {
       method: 'POST',
-      body: { email: email.value, password: password.value }
+      body: { email: email.value, password: password.value, type: 'ADMIN' }
     })
 
     const token = useCookie('admin_auth_token')

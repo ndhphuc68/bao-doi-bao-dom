@@ -17,11 +17,20 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() body) {
-    const user = await this.authService.validateUser(body.email, body.password);
+  async login(@Body() body: { email?: string; password?: string; type?: 'ADMIN' | 'USER' }) {
+    const user = await this.authService.validateUser(body.email || '', body.password || '');
     if (!user) {
       throw new UnauthorizedException('Wrong email or password');
     }
+
+    if (body.type === 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+      throw new UnauthorizedException('Chỉ admin mới có thể đăng nhập trang quản trị.');
+    }
+
+    if (body.type === 'USER' && user.role === 'SUPER_ADMIN') {
+      throw new UnauthorizedException('Admin không thể đăng nhập ứng dụng người dùng.');
+    }
+
     return this.authService.login(user);
   }
 

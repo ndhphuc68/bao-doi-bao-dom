@@ -37,7 +37,7 @@ export function useApi() {
       register: (body: { email: string; password: string; name?: string; phoneNumber?: string }) =>
         apiFetch<AuthTokenResponse>('/auth/register', { method: 'POST', body }),
       login: (body: { email: string; password: string }) =>
-        apiFetch<AuthTokenResponse>('/auth/login', { method: 'POST', body }),
+        apiFetch<AuthTokenResponse>('/auth/login', { method: 'POST', body: { ...body, type: 'USER' } }),
       profile: (token: string) =>
         apiFetch<any>('/auth/profile', {
           headers: { Authorization: `Bearer ${token}` }

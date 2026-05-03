@@ -13,10 +13,8 @@ import { CollectionPoint } from '../collection-points/collection-point.entity';
 export enum UserRole {
   /** Người dùng ứng dụng (mặc định) */
   USER = 'USER',
-  /** Quản trị tổng: quản lý admin cửa hàng, bài đăng, xem toàn bộ đơn */
+  /** Quản trị tổng: quản lý admin, bài đăng, xem toàn bộ đơn */
   SUPER_ADMIN = 'SUPER_ADMIN',
-  /** Admin cửa hàng: chỉ xử lý đơn tại điểm thu gom được gán */
-  STORE_ADMIN = 'STORE_ADMIN',
 }
 
 @Entity('users')
