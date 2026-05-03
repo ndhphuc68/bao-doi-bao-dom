@@ -1,38 +1,41 @@
 # Bao đổi bao dom — Hướng dẫn chạy nhanh
 
-Tài liệu tóm tắt: **Docker**, **Cloudflare Tunnel** (panel / quick tunnel), và **chạy seed** dữ liệu mẫu.
+Tài liệu này dành cho chạy local/dev. Hướng dẫn production bằng script và Cloudflare public URL nằm ở [README.prod.md](README.prod.md).
 
 ---
 
 ## Yêu cầu
 
-- [Docker](https://docs.docker.com/get-docker/) + Docker Compose v2  
-- (Tuỳ chọn) Tài khoản Cloudflare nếu dùng tunnel có token (Zero Trust)
+- Docker + Docker Compose v2
+- Node.js/npm nếu muốn chạy seed trực tiếp trên máy
 
 ---
 
-## 1. Chạy bằng Docker (mặc định — máy local / LAN)
+## 1. Chạy local / LAN bằng Docker
 
 Trong thư mục gốc repo:
 
 ```bash
-# Gợi ý: đặt LOCAL_IP = IP máy bạn trên LAN (điện thoại truy cập được)
-export LOCAL_IP=192.168.x.x   # ví dụ; không bắt buộc nếu chỉ dùng localhost
+# Gợi ý: đặt LOCAL_IP = IP máy bạn trên LAN, để điện thoại truy cập được
+export LOCAL_IP=192.168.x.x
 
 docker compose up --build
 ```
 
 **Cổng dịch vụ**
 
-| Dịch vụ        | URL (máy bạn)        | Ghi chú                    |
-|----------------|----------------------|----------------------------|
-| App người dùng | http://localhost:3000 | Nuxt frontend              |
-| API backend    | http://localhost:3001 | NestJS                     |
-| Admin web      | http://localhost:3002 | Nuxt admin                 |
-| Adminer (DB)   | http://localhost:8080 | Server: `db`, user/pass xem `docker-compose.yml` |
+| Dịch vụ | URL máy bạn | Ghi chú |
+|---------|-------------|---------|
+| App người dùng | http://localhost:3000 | Nuxt frontend |
+| API backend | http://localhost:3001 | NestJS |
+| Admin web | http://localhost:3002 | Nuxt admin |
+| Adminer DB | http://localhost:8080 | Server: `db`, user/pass xem `docker-compose.yml` |
 
-Chuỗi kết nối Postgres (từ máy host):  
-`postgresql://root:root@localhost:5432/appdb?schema=public`
+Chuỗi kết nối Postgres từ máy host:
+
+```text
+postgresql://root:root@localhost:5432/appdb?schema=public
+```
 
 Dừng stack:
 
@@ -42,92 +45,26 @@ docker compose down
 
 ---
 
-## 2. Cloudflare — hai cách
+## 2. Quick Tunnel kiểu dev
 
-**Mặc định khi chạy Cloudflare tunnel, stack sẽ chạy theo chế độ production** (build trước rồi serve) qua file `docker-compose.prod.yml`.
-Nếu bạn muốn chạy kiểu dev (hot reload), xem lệnh “dev” ở mỗi mục bên dưới.
-
-### A) Quick Tunnel (`*.trycloudflare.com`) — không cần domain, URL đổi mỗi lần chạy
-
-Dùng khi muốn chia sẻ nhanh app + API **cùng một origin** (Nginx gộp `/` → frontend, `/api/` → backend).
-
-```bash
-./scripts/quicktunnel-up.sh
-# tương đương:
-# docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.quicktunnel.yml up
-```
-
-**Chạy quick tunnel kiểu dev (HMR, phục vụ phát triển)**
+Nếu cần chia sẻ nhanh app dev qua Cloudflare Quick Tunnel:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.quicktunnel.yml up --build
 ```
 
-**Xem URL public**
+Trong log Docker:
 
-- Trong log Docker, tìm container **`cloudflared-quick`** → một dòng URL dạng `https://xxxx.trycloudflare.com` (app user: UI + API qua `/api`).
-- Container **`cloudflared-quick-admin`** → URL thứ hai cho **admin** (port 3002).
+- `cloudflared-quick`: URL app user, API đi qua `/api`.
+- `cloudflared-quick-admin`: URL admin web.
 
-**Nếu URL app user không vào được**
-
-- Xem log theo thứ tự:
-  - `tunnel-dev-proxy` (Nginx) có lên không
-  - `frontend` có “listening” trên port `3000` không
-  - `backend` có “listening” trên port `3000` không
-  - `cloudflared-quick` có in ra URL `trycloudflare.com` không
-- Đảm bảo bạn đang chạy đúng file compose (production):
-  - `docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.quicktunnel.yml up --build`
-
-**Admin từ xa (qua tunnel)**
-
-1. Copy URL **app user** (tunnel thứ nhất), ví dụ `https://abc.trycloudflare.com` (không có dấu `/` cuối).
-2. Tạo / sửa file **`.env`** ở **thư mục gốc repo**:
-
-   ```env
-   ADMIN_NUXT_PUBLIC_API_BASE=https://abc.trycloudflare.com/api
-   ```
-
-3. Khởi động lại stack quick tunnel (để `admin-frontend` đọc biến này).
-
-4. Mở URL từ log **`cloudflared-quick-admin`** để vào panel admin.
-
-**Lưu ý:** Mỗi lần tắt/bật quick tunnel, URL thường thay đổi — cần cập nhật lại `ADMIN_NUXT_PUBLIC_API_BASE` nếu admin gọi API qua tunnel app.
+Production Quick Tunnel dùng `./scripts/public.sh run`, xem [README.prod.md](README.prod.md).
 
 ---
 
-### B) Cloudflare Tunnel có token (Zero Trust — URL ổn định theo domain bạn cấu hình)
+## 3. Chạy seed dữ liệu mẫu
 
-1. Vào Cloudflare **Zero Trust** → **Networks** → **Tunnels** → tạo tunnel, lấy **token**.
-2. Đặt biến môi trường (hoặc file `.env` ở thư mục gốc):
-
-   ```env
-   CLOUDFLARE_TUNNEL_TOKEN=eyJ...
-   ```
-
-3. Chạy kèm profile `tunnel`:
-
-   ```bash
-   docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile tunnel up --build
-   ```
-
-   Chạy kiểu dev (hot reload):
-
-   ```bash
-   docker compose --profile tunnel up --build
-   ```
-
-4. Trong dashboard tunnel, cấu hình **Public Hostname** trỏ về service Docker, ví dụ:
-   - `http://frontend:3000`
-   - `http://backend:3000`
-   - `http://admin-frontend:3002`
-
-Chi tiết gợi ý nằm trong comment của `docker-compose.yml` (service `cloudflared`).
-
----
-
-## 3. Chạy seed (điểm thu gom & dữ liệu mẫu)
-
-Seed chạy trong **backend**, cần **Postgres đã chạy** và biến `DATABASE_URL` khớp DB.
+Seed chạy trong backend, cần Postgres đã chạy và `DATABASE_URL` khớp DB.
 
 ### Khi đang dùng Docker Compose
 
@@ -143,9 +80,7 @@ Chỉ seed bảng điểm thu gom:
 docker compose exec backend npm run seed:collection-points
 ```
 
-### Chạy seed trên máy (không vào container)
-
-Cài dependency trong `backend/`, rồi:
+### Chạy seed trên máy
 
 ```bash
 cd backend
@@ -156,24 +91,27 @@ npm run seed
 
 ---
 
-## 4. Biến môi trường hay dùng (tóm tắt)
+## 4. Biến môi trường local hay dùng
 
 | Biến | Ý nghĩa |
 |------|---------|
-| `LOCAL_IP` | IP LAN cho link trong compose (mặc định trong file có placeholder). |
-| `CLOUDFLARE_TUNNEL_TOKEN` | Bật service `cloudflared` (profile `tunnel`). |
-| `ADMIN_NUXT_PUBLIC_API_BASE` | Khi dùng **quick tunnel**: base URL API cho admin (ví dụ `https://xxxx.trycloudflare.com/api`). |
-| `NUXT_PUBLIC_ADMIN_EMAILS` | Email được phép đăng nhập admin (xem `docker-compose.yml`). |
+| `LOCAL_IP` | IP LAN cho link trong compose. |
+| `NUXT_PUBLIC_ADMIN_EMAILS` | Email được phép đăng nhập admin. |
+
+Biến production chi tiết nằm ở [README.prod.md](README.prod.md).
 
 ---
 
 ## 5. Cấu trúc thư mục chính
 
 - `backend/` — API NestJS, seed trong `src/database/`
-- `frontend/` — app người dùng (Nuxt)
-- `admin-frontend/` — admin (Nuxt)
-- `docker-compose.yml` — stack chính
+- `frontend/` — app người dùng Nuxt
+- `admin-frontend/` — admin Nuxt
+- `docker-compose.yml` — stack local/dev
+- `docker-compose.prod.yml` — stack production độc lập
 - `docker-compose.quicktunnel.yml` — quick tunnel + proxy
-- `scripts/quicktunnel-up.sh` — shortcut chạy quick tunnel
-
-Nếu cần chỉnh CORS / origin khi deploy, xem `FRONTEND_ORIGIN` và các biến trong `docker-compose.yml`.
+- `scripts/local-links.sh` — chạy BE, FE user, FE admin thành 3 link local riêng
+- `scripts/prod.sh` — shortcut chạy production
+- `scripts/public.sh` — shortcut chạy public tunnel
+- `Makefile` — shortcut thay thế nếu máy có sẵn `make`
+- `README.prod.md` — hướng dẫn production

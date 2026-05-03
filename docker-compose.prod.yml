@@ -1,25 +1,87 @@
+name: bao-doi-bao-dom-prod
+
 services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-root}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-root}
+      POSTGRES_DB: ${POSTGRES_DB:-appdb}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Giao diện web xem/sửa PostgreSQL (http://localhost:${ADMINER_PORT:-8080})
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    restart: unless-stopped
     environment:
       NODE_ENV: production
-    volumes: []
+      DATABASE_URL: ${DATABASE_URL:-postgresql://root:root@db:5432/appdb?schema=public}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000,http://127.0.0.1:3000,http://${LOCAL_IP:-localhost}:3000,http://localhost:3002,http://127.0.0.1:3002,http://${LOCAL_IP:-localhost}:3002}
+      CORS_REFLECT_REQUEST_ORIGIN: ${CORS_REFLECT_REQUEST_ORIGIN:-}
+    ports:
+      - "${BACKEND_PORT:-3001}:3000"
+    depends_on:
+      - db
+    volumes:
+      - backend_uploads:/app/uploads
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    restart: unless-stopped
     environment:
       NODE_ENV: production
-    volumes: []
+      NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://${LOCAL_IP:-localhost}:3001}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend
 
   admin-frontend:
     build:
       context: ./admin-frontend
       dockerfile: Dockerfile
+    restart: unless-stopped
     environment:
       NODE_ENV: production
-    volumes: []
+      NUXT_PUBLIC_API_BASE: ${ADMIN_NUXT_PUBLIC_API_BASE:-http://${LOCAL_IP:-localhost}:3001}
+      NUXT_PUBLIC_ADMIN_EMAILS: ${NUXT_PUBLIC_ADMIN_EMAILS:-}
+      NUXT_PUBLIC_SUPER_ADMIN_EMAILS: ${NUXT_PUBLIC_SUPER_ADMIN_EMAILS:-}
+    ports:
+      - "${ADMIN_FRONTEND_PORT:-3002}:3002"
+    depends_on:
+      - backend
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    profiles:
+      - tunnel
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - frontend
+      - backend
+      - admin-frontend
+
+volumes:
+  pgdata:
+  backend_uploads:
