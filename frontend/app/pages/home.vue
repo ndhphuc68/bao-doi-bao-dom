@@ -52,7 +52,9 @@ const thumbClasses = [
 ]
 
 function excerptFromBody(body: string, max = 120) {
-  const t = body.replace(/\s+/g, ' ').trim()
+  // Strip HTML tags
+  const cleanText = body.replace(/<[^>]*>?/gm, '')
+  const t = cleanText.replace(/\s+/g, ' ').trim()
   if (t.length <= max) return t
   return `${t.slice(0, max).trimEnd()}…`
 }

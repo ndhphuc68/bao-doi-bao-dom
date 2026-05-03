@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+const localePath = useLocalePath()
 definePageMeta({ middleware: ['require-auth'] })
 
 const { wastePosts } = useApi()
@@ -12,7 +14,9 @@ const thumbClasses = [
 ]
 
 function excerptFromBody(body: string, max = 160) {
-  const t = body.replace(/\s+/g, ' ').trim()
+  // Strip HTML tags
+  const cleanText = body.replace(/<[^>]*>?/gm, '')
+  const t = cleanText.replace(/\s+/g, ' ').trim()
   if (t.length <= max) return t
   return `${t.slice(0, max).trimEnd()}…`
 }
@@ -22,19 +26,19 @@ const { data: posts, pending, error, refresh } = await useAsyncData('waste_posts
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col bg-slate-50">
-    <AppPageHeader title="Thông tin rác thải điện tử" back-to="/home" />
+    <AppPageHeader :title="t('home.news_title')" :back-to="localePath('/home')" />
 
     <main class="flex-1 overflow-y-auto px-4 pb-28 pt-2">
-      <p v-if="pending" class="py-8 text-center text-sm text-slate-500">Đang tải…</p>
-      <p v-else-if="error" class="py-8 text-center text-sm text-rose-600">Không tải được bài viết. Thử lại sau.</p>
+      <p v-if="pending" class="py-8 text-center text-sm text-slate-500">{{ t('home.loading') }}</p>
+      <p v-else-if="error" class="py-8 text-center text-sm text-rose-600">{{ t('home.error_loading') }}</p>
       <p v-else-if="!posts?.length" class="py-8 text-center text-sm text-slate-500">
-        Chưa có bài viết nào. Admin sẽ cập nhật nội dung sớm.
+        {{ t('home.no_posts') }}
       </p>
       <div v-else class="space-y-3">
         <NuxtLink
           v-for="(a, i) in posts"
           :key="a.id"
-          :to="`/articles/${a.id}`"
+          :to="localePath(`/articles/${a.id}`)"
           class="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm transition active:scale-[0.99]"
         >
           <div class="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-100 shadow-inner">
@@ -58,7 +62,7 @@ const { data: posts, pending, error, refresh } = await useAsyncData('waste_posts
       </div>
 
       <div class="mt-6 flex justify-center">
-        <Button label="Tải lại" text size="small" @click="refresh" />
+        <Button :label="t('rewards.retry')" text size="small" @click="refresh" />
       </div>
     </main>
 
