@@ -105,7 +105,6 @@ function formatRole(role: string) {
 
 <template>
   <div class="flex flex-col gap-6">
-    <Toast />
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-xl font-bold tracking-tight">Quản lý tài khoản Admin</h1>

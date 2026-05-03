@@ -138,6 +138,14 @@ const pointsSorted = computed(() => {
     })
 })
 
+const mediaUrl = useMediaUrl()
+
+const userPos = computed(() =>
+  userLocation.value
+    ? { lat: userLocation.value.latitude, lng: userLocation.value.longitude }
+    : null
+)
+
 /** Hiển thị tất cả điểm trên bản đồ (popup); danh sách bên dưới vẫn gợi ý tối đa 4 điểm gần nhất. */
 const mapPois = computed(() => {
   const raw = points.value || []
@@ -148,15 +156,10 @@ const mapPois = computed(() => {
       lat: p.latitude,
       lng: p.longitude,
       title: p.name,
-      description: [p.address, p.openHours].filter(Boolean).join(' · ')
+      description: [p.address, p.openHours].filter(Boolean).join(' · '),
+      imageUrl: p.imageUrl
     }))
 })
-
-const userPos = computed(() =>
-  userLocation.value
-    ? { lat: userLocation.value.latitude, lng: userLocation.value.longitude }
-    : null
-)
 </script>
 
 <template>
@@ -250,8 +253,11 @@ const userPos = computed(() =>
             "
             @click="selectRow(pt)"
           >
-            <div class="mr-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50">
-              <Icon name="heroicons:building-storefront" class="h-6 w-6 text-emerald-600" />
+            <div class="mr-3 h-12 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 shadow-inner">
+              <img v-if="pt.imageUrl" :src="mediaUrl(pt.imageUrl)" class="h-full w-full object-cover" />
+              <div v-else class="flex h-full w-full items-center justify-center bg-emerald-50">
+                <Icon name="heroicons:building-storefront" class="h-5 w-5 text-emerald-600" />
+              </div>
             </div>
             <div class="min-w-0 flex-1">
               <div class="mb-1 flex items-start justify-between gap-2">
@@ -278,9 +284,10 @@ const userPos = computed(() =>
         <div v-if="selectedPoint" class="mt-5 border-t border-slate-100 pt-5">
           <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">Chi tiết điểm thu</p>
           <div
-            class="mb-3 flex aspect-[16/10] items-center justify-center rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200"
+            class="mb-3 flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200"
           >
-            <Icon name="heroicons:building-storefront" class="h-14 w-14 text-slate-400" />
+            <img v-if="selectedPoint.imageUrl" :src="mediaUrl(selectedPoint.imageUrl)" class="h-full w-full object-cover" />
+            <Icon v-else name="heroicons:building-storefront" class="h-14 w-14 text-slate-400" />
           </div>
           <h4 class="mb-2 text-base font-bold text-slate-900">{{ selectedPoint.name }}</h4>
           <p class="mb-2 flex text-sm text-slate-600">

@@ -20,7 +20,7 @@
         <!-- App Name / Tagline -->
         <div class="mt-8 overflow-hidden text-center">
           <h1 class="animate-in slide-in-from-bottom duration-700 delay-300 fill-mode-both text-2xl font-bold tracking-tight text-slate-900">
-            Eco
+            {{ t('common.app_name') }}
           </h1>
           <p class="mt-1 animate-in slide-in-from-bottom duration-700 delay-500 fill-mode-both text-sm font-medium text-slate-500">
             {{ t('common.tagline') }}

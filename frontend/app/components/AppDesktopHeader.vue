@@ -55,8 +55,7 @@ function logout() {
           <img src="/logo_splash.png" alt="Eco Logo" class="h-full w-full object-contain" />
         </div>
         <div class="flex flex-col">
-          <span class="text-xl font-black leading-none tracking-tighter text-emerald-600 sm:block">Eco</span>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">{{ t('nav.recycle') }}</span>
+          <span class="text-xl font-black leading-none tracking-tighter text-emerald-600 sm:block">{{ t('common.app_name') }}</span>
         </div>
       </NuxtLink>
 

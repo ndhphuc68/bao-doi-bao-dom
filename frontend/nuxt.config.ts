@@ -57,8 +57,8 @@ export default defineNuxtConfig({
     filename: 'sw.ts',
     registerType: 'autoUpdate',
     manifest: {
-      name: 'Eco — Tái chế điện tử',
-      short_name: 'Eco',
+      name: 'EcoReturn — Tái chế điện tử',
+      short_name: 'EcoReturn',
       description: 'Đặt lịch hoàn trả thiết bị, tìm điểm thu gom gần bạn',
       theme_color: '#059669',
       background_color: '#ffffff',
@@ -87,7 +87,7 @@ export default defineNuxtConfig({
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
-        { name: 'apple-mobile-web-app-title', content: 'Eco' },
+        { name: 'apple-mobile-web-app-title', content: 'EcoReturn' },
         { name: 'format-detection', content: 'telephone=no' }
       ],
       link: [

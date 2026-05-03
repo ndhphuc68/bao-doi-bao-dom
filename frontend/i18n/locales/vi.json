@@ -12,7 +12,8 @@
     "vietnamese": "Tiếng Việt",
     "english": "Tiếng Anh",
     "tagline": "Tái chế thông minh, tương lai xanh",
-    "redirecting": "Đang chuyển hướng…"
+    "redirecting": "Đang chuyển hướng…",
+    "app_name": "EcoReturn"
   },
   "home": {
     "greeting_morning": "Chào buổi sáng",
@@ -142,7 +143,8 @@
     "permission_denied": "Bật quyền vị trí để xem điểm gần bạn trên bản đồ.",
     "loading_map": "Đang tải bản đồ…",
     "start_recycle": "Đặt lịch thu gom",
-    "guide": "Chọn thiết bị và lịch trong các bước tiếp theo — bạn sẽ chọn lại điểm thu gom ở bước gần cuối."
+    "guide": "Chọn thiết bị và lịch trong các bước tiếp theo — bạn sẽ chọn lại điểm thu gom ở bước gần cuối.",
+    "nearby_points": "Các điểm thu gom gần bạn"
   },
   "recycle": {
     "title": "Hoàn trả",

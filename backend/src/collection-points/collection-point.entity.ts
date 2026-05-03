@@ -22,4 +22,7 @@ export class CollectionPoint {
 
   @Column({ nullable: true })
   distanceText: string; // Fake distance for demo UI
+
+  @Column({ nullable: true })
+  imageUrl: string;
 }

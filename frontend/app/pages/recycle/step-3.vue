@@ -23,7 +23,7 @@ const nextStep = () => {
         <template #content>
           <Tag value="+10 điểm" severity="success" class="absolute right-4 top-4 z-10" />
           <div
-            class="relative mb-4 h-32 overflow-hidden rounded-xl bg-gradient-to-br from-slate-100 to-slate-200/80"
+            class="relative mb-4 h-48 overflow-hidden rounded-xl bg-gradient-to-br from-slate-100 to-slate-200/80 md:h-64"
           >
             <img
               v-if="store.images[0]"

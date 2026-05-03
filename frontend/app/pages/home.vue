@@ -199,11 +199,12 @@ function joinCampaign() {
               <div v-else class="h-full w-full bg-gradient-to-br" :class="thumbClasses[i % thumbClasses.length]" />
             </div>
             <div class="min-w-0 flex-1 py-0.5">
-              <h4 class="mb-1 line-clamp-2 text-sm font-bold leading-snug text-slate-900">
+              <h4 class="mb-1 line-clamp-2 text-sm font-extrabold leading-snug text-slate-900">
                 {{ a.title }}
               </h4>
-              <p class="line-clamp-2 text-xs leading-relaxed text-slate-600">
-                {{ excerptFromBody(a.body) }}
+              <p class="text-[10px] font-medium text-slate-400">
+                <i class="pi pi-calendar mr-1 text-[9px]" />
+                {{ new Date(a.createdAt).toLocaleDateString(t('common.vietnamese') === 'Tiếng Việt' ? 'vi-VN' : 'en-US') }}
               </p>
             </div>
           </NuxtLink>

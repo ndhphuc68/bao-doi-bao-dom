@@ -12,7 +12,8 @@
     "vietnamese": "Vietnamese",
     "english": "English",
     "tagline": "Smart recycling, green future",
-    "redirecting": "Redirecting…"
+    "redirecting": "Redirecting…",
+    "app_name": "EcoReturn"
   },
   "home": {
     "greeting_morning": "Good morning",
@@ -142,7 +143,8 @@
     "permission_denied": "Enable location permission to see nearby points.",
     "loading_map": "Loading map...",
     "start_recycle": "Schedule collection",
-    "guide": "Select devices and schedule in next steps — you will select the collection point again at the final step."
+    "guide": "Select devices and schedule in next steps — you will select the collection point again at the final step.",
+    "nearby_points": "Nearby collection points"
   },
   "recycle": {
     "title": "Recycle",

@@ -15,11 +15,33 @@ type CollectionPoint = {
   longitude?: number | null
   openHours?: string
   distanceText?: string
+  imageUrl?: string
 }
 
 const token = useCookie('admin_auth_token')
 const toast = useToast()
-const { apiFetch } = useApi()
+const { apiFetch, baseURL } = useApi()
+const mediaUrl = useMediaUrl()
+
+const onImageUpload = async (event: any) => {
+  const file = event.files[0]
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  try {
+    const res = await $fetch<{ url: string }>(`${baseURL}/uploads`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token.value}` },
+      body: formData
+    })
+    form.imageUrl = res.url
+    toast.add({ severity: 'info', summary: 'Đã tải ảnh lên', life: 2000 })
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Lỗi tải ảnh', detail: getApiErrorMessage(e), life: 3000 })
+  }
+}
 
 const {
   data: rows,
@@ -53,7 +75,8 @@ const form = reactive({
   address: '',
   latitude: null as number | null,
   longitude: null as number | null,
-  openHours: '08:00 - 20:00'
+  openHours: '08:00 - 20:00',
+  imageUrl: ''
 })
 
 const openAdd = () => {
@@ -64,6 +87,7 @@ const openAdd = () => {
   form.latitude = null
   form.longitude = null
   form.openHours = '08:00 - 20:00'
+  form.imageUrl = ''
   dialogVisible.value = true
 }
 
@@ -75,6 +99,7 @@ const openEdit = (cp: CollectionPoint) => {
   form.latitude = cp.latitude ?? null
   form.longitude = cp.longitude ?? null
   form.openHours = cp.openHours || ''
+  form.imageUrl = cp.imageUrl || ''
   dialogVisible.value = true
 }
 
@@ -140,7 +165,6 @@ const deletePoint = async () => {
 
 <template>
   <div class="flex flex-col gap-6">
-    <Toast />
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-xl font-bold tracking-tight">Quản lý Điểm thu gom</h1>
@@ -166,6 +190,7 @@ const deletePoint = async () => {
         <table class="min-w-full divide-y divide-slate-200 text-sm">
           <thead class="bg-slate-50">
             <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <th class="px-5 py-4">Ảnh</th>
               <th class="px-5 py-4">Tên điểm</th>
               <th class="px-5 py-4">Địa chỉ</th>
               <th class="px-5 py-4 text-center">Tọa độ</th>
@@ -175,6 +200,14 @@ const deletePoint = async () => {
           </thead>
           <tbody class="divide-y divide-slate-100 bg-white">
             <tr v-for="cp in filteredRows" :key="cp.id" class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-5 py-4">
+                <div class="h-12 w-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-100 shadow-inner">
+                  <img v-if="cp.imageUrl" :src="mediaUrl(cp.imageUrl)" class="h-full w-full object-cover" />
+                  <div v-else class="h-full w-full flex items-center justify-center text-slate-300">
+                    <i class="pi pi-image" />
+                  </div>
+                </div>
+              </td>
               <td class="px-5 py-4 font-bold text-slate-900">{{ cp.name }}</td>
               <td class="px-5 py-4 text-slate-600">{{ cp.address }}</td>
               <td class="px-5 py-4 text-center text-slate-500 font-mono text-xs">
@@ -200,6 +233,27 @@ const deletePoint = async () => {
     <!-- Add/Edit Dialog -->
     <Dialog v-model:visible="dialogVisible" :header="isEdit ? 'Chỉnh sửa điểm thu gom' : 'Thêm điểm thu gom mới'" modal class="w-[500px]" :draggable="false">
       <div class="flex flex-col gap-4 pt-2">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold uppercase text-slate-500">Ảnh đại diện</label>
+          <div class="flex items-center gap-4">
+            <div class="h-24 w-24 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+              <img v-if="form.imageUrl" :src="mediaUrl(form.imageUrl)" class="h-full w-full object-cover" />
+              <i v-else class="pi pi-image text-2xl text-slate-300" />
+            </div>
+            <div class="flex-1">
+              <FileUpload 
+                mode="basic" 
+                auto 
+                custom-upload 
+                accept="image/*" 
+                @uploader="onImageUpload" 
+                choose-label="Chọn ảnh"
+                class="!bg-slate-100 !text-slate-700 !border-0 !rounded-xl"
+              />
+              <p class="text-[10px] text-slate-500 mt-2">Dung lượng tối đa 5MB. Định dạng: JPG, PNG, WEBP.</p>
+            </div>
+          </div>
+        </div>
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase text-slate-500">Tên điểm <span class="text-rose-500">*</span></label>
           <InputText v-model="form.name" placeholder="Ví dụ: EcoPoint Quận 1" class="rounded-xl" />

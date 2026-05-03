@@ -157,7 +157,6 @@ const exportCSV = () => {
 
 <template>
   <div class="flex flex-col gap-4">
-    <Toast />
     
     <div class="flex items-center justify-between">
       <div>

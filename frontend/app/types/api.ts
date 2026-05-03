@@ -26,6 +26,7 @@ export interface CollectionPointDto {
   longitude: number
   openHours?: string | null
   distanceText?: string | null
+  imageUrl?: string | null
 }
 
 export interface CreateRecyclingRequestBody {

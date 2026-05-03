@@ -7,6 +7,7 @@ definePageMeta({ middleware: ['require-auth'] })
 
 const router = useRouter()
 const config = useRuntimeConfig()
+const mediaUrl = useMediaUrl()
 
 const { data: points } = await useFetch<CollectionPointDto[]>('/collection-points', {
   baseURL: config.public.apiBase
@@ -24,7 +25,8 @@ const pois = computed(() => {
       lat: p.latitude,
       lng: p.longitude,
       title: p.name,
-      description: [p.address, p.openHours].filter(Boolean).join(' · ')
+      description: [p.address, p.openHours].filter(Boolean).join(' · '),
+      imageUrl: p.imageUrl
     }))
 })
 
@@ -110,7 +112,38 @@ function startRecycle() {
         </ClientOnly>
       </div>
 
-      <div class="mt-4 space-y-2">
+      <!-- Nearby Points List -->
+      <div v-if="points?.length" class="mt-6 flex-1 space-y-4">
+        <h3 class="px-1 text-sm font-bold text-slate-800 uppercase tracking-wider">{{ t('map.nearby_points') }}</h3>
+        <div class="space-y-3">
+          <div 
+            v-for="p in points" 
+            :key="p.id"
+            class="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm transition active:scale-[0.98]"
+          >
+            <div class="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-100 shadow-inner">
+              <img v-if="p.imageUrl" :src="mediaUrl(p.imageUrl)" class="h-full w-full object-cover" />
+              <div v-else class="h-full w-full flex items-center justify-center bg-emerald-50 text-emerald-200">
+                <i class="pi pi-map-marker text-2xl" />
+              </div>
+            </div>
+            <div class="flex-1 py-1">
+              <h4 class="text-sm font-bold text-slate-900 line-clamp-1">{{ p.name }}</h4>
+              <p class="mt-0.5 text-xs text-slate-500 line-clamp-2 leading-relaxed">{{ p.address }}</p>
+              <div class="mt-2 flex items-center gap-3">
+                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  {{ p.openHours || '08:00 - 20:00' }}
+                </span>
+                <span v-if="p.distanceText" class="text-[10px] font-medium text-slate-400">
+                  <i class="pi pi-directions text-[9px] mr-0.5" /> {{ p.distanceText }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 space-y-2">
         <Button
           :label="t('map.start_recycle')"
           icon="pi pi-calendar-plus"

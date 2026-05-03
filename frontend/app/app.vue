@@ -4,8 +4,9 @@ import Toast from 'primevue/toast'
 const isSplashVisible = ref(true)
 const token = useCookie('auth_token')
 
+const { t } = useI18n()
 useHead({
-  titleTemplate: (title) => title ? `${title} | Eco` : 'Eco — Tái chế điện tử'
+  titleTemplate: (title) => title ? `${title} | ${t('common.app_name')}` : `${t('common.app_name')} — ${t('common.tagline')}`
 })
 
 onMounted(() => {

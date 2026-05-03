@@ -9,7 +9,10 @@ type MapPoi = {
   lng: number
   title: string
   description?: string
+  imageUrl?: string | null
 }
+
+const mediaUrl = useMediaUrl()
 
 function escapeHtml(s: string) {
   return s
@@ -104,7 +107,8 @@ function renderMarkers() {
   if (poiList.length > 0) {
     const boundsPts: L.LatLng[] = []
     for (const p of poiList) {
-      const html = `<div class="leaflet-poi-popup text-sm"><strong>${escapeHtml(p.title)}</strong>${p.description ? `<br/><span class="text-slate-600">${escapeHtml(p.description)}</span>` : ''}</div>`
+      const imgHtml = p.imageUrl ? `<img src="${mediaUrl(p.imageUrl)}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:8px; display:block;" />` : ''
+      const html = `<div class="leaflet-poi-popup text-sm" style="min-width:180px;">${imgHtml}<strong>${escapeHtml(p.title)}</strong>${p.description ? `<br/><span class="text-slate-600">${escapeHtml(p.description)}</span>` : ''}</div>`
       L.marker([p.lat, p.lng])
         .bindPopup(html)
         .on('click', () => emit('marker-click', p))
