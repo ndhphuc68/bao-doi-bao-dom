@@ -30,7 +30,7 @@ const { data: post, pending, error } = await useAsyncData(
         <p class="mb-4 text-xs text-slate-400">
           {{ new Date(post.createdAt).toLocaleString(t('common.vietnamese') === 'Tiếng Việt' ? 'vi-VN' : 'en-US') }}
         </p>
-        <div class="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700" v-html="post.body"></div>
+        <div class="article-content max-w-none text-sm leading-relaxed text-slate-700" v-html="post.body"></div>
       </article>
       <p v-else class="py-12 text-center text-sm text-rose-600">
         {{ error ? t('home.error_loading') : t('home.no_posts') }}
@@ -40,3 +40,42 @@ const { data: post, pending, error } = await useAsyncData(
     <AppBottomNav />
   </div>
 </template>
+
+<style scoped>
+.article-content :deep(p) {
+  margin-bottom: 1rem;
+}
+.article-content :deep(strong) {
+  font-weight: 700;
+  color: #0f172a;
+}
+.article-content :deep(ul), .article-content :deep(ol) {
+  margin-bottom: 1rem;
+  padding-left: 1.25rem;
+}
+.article-content :deep(ul) {
+  list-style-type: disc;
+}
+.article-content :deep(ol) {
+  list-style-type: decimal;
+}
+.article-content :deep(li) {
+  margin-bottom: 0.25rem;
+}
+.article-content :deep(h2), .article-content :deep(h3) {
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.article-content :deep(h2) {
+  font-size: 1.125rem;
+}
+.article-content :deep(h3) {
+  font-size: 1rem;
+}
+.article-content :deep(img) {
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+}
+</style>
