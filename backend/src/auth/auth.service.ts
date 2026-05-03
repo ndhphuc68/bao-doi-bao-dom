@@ -59,6 +59,7 @@ export class AuthService {
         email: body.email,
         password: hashedPassword,
         name: body.name || body.email.split('@')[0],
+        phoneNumber: body.phoneNumber,
         points: signupPoints,
         role: UserRole.USER,
       });
@@ -76,5 +77,15 @@ export class AuthService {
 
   async getPointLedgerSummary(userId: string) {
     return this.pointLedgerService.getSummaryForUser(userId);
+  }
+
+  async updateProfile(userId: string, body: { name?: string; phoneNumber?: string }) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException();
+    if (body.name) user.name = body.name.trim();
+    if (body.phoneNumber) user.phoneNumber = body.phoneNumber.trim();
+    const updated = await this.usersService.save(user);
+    const { password, ...rest } = updated;
+    return rest;
   }
 }

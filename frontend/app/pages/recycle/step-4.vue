@@ -18,6 +18,17 @@ const locating = ref(false)
 
 const selectedPoint = ref(null)
 const mapFocus = ref<[number, number] | null>(null)
+const searchQuery = ref('')
+
+function handleMarkerClick(poi: any) {
+  const pt = (points.value || []).find(p => p.id === poi.id)
+  if (pt) selectRow(pt)
+}
+
+function openDirections(pt: any) {
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${pt.latitude},${pt.longitude}`
+  window.open(url, '_blank')
+}
 
 function selectRow(pt) {
   selectedPoint.value = pt
@@ -94,17 +105,23 @@ onMounted(() => {
 const pointsSorted = computed(() => {
   const raw = points.value || []
   const loc = userLocation.value
+  
+  const filtered = raw.filter(p => {
+    if (!searchQuery.value) return true
+    const q = searchQuery.value.toLowerCase()
+    return p.name.toLowerCase().includes(q) || p.address.toLowerCase().includes(q)
+  })
+
   if (!loc) {
-    return raw
+    return filtered
       .map((p) => ({
       ...p,
       _distanceKm: null as number | null,
       distanceText: p.distanceText ?? null
       }))
-      .slice(0, 4)
   }
 
-  return raw
+  return filtered
     .map((p) => {
       const km = haversineKm(loc, { latitude: p.latitude, longitude: p.longitude })
       return {
@@ -119,7 +136,6 @@ const pointsSorted = computed(() => {
       if (b._distanceKm == null) return -1
       return a._distanceKm - b._distanceKm
     })
-    .slice(0, 4)
 })
 
 /** Hiển thị tất cả điểm trên bản đồ (popup); danh sách bên dưới vẫn gợi ý tối đa 4 điểm gần nhất. */
@@ -128,6 +144,7 @@ const mapPois = computed(() => {
   return raw
     .filter((p) => typeof p.latitude === 'number' && typeof p.longitude === 'number')
     .map((p) => ({
+      id: p.id,
       lat: p.latitude,
       lng: p.longitude,
       title: p.name,
@@ -157,6 +174,7 @@ const userPos = computed(() =>
             :fit-bounds="!selectedPoint"
             :focus="mapFocus"
             :focus-zoom="16"
+            @marker-click="handleMarkerClick"
           />
           <template #fallback>
             <div class="flex h-full items-center justify-center bg-slate-100 text-sm text-slate-500">
@@ -176,11 +194,23 @@ const userPos = computed(() =>
 
         <RecycleProgress :step="4" />
 
+        <div class="mb-5">
+          <div class="relative">
+            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <InputText 
+              v-model="searchQuery" 
+              placeholder="Tìm điểm thu gom..." 
+              fluid 
+              class="!rounded-2xl !pl-10 !bg-slate-50 !border-slate-100 focus:!bg-white"
+            />
+          </div>
+        </div>
+
         <div class="mb-4 flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <h3 class="text-lg font-bold tracking-tight text-slate-900">Các điểm quanh bạn</h3>
+            <h3 class="text-lg font-bold tracking-tight text-slate-900">Các điểm gần bạn</h3>
             <p class="mt-1 text-xs text-slate-500">
-              Sắp xếp theo vị trí hiện tại (lat/long) để hiện cửa hàng gần nhất.
+              Sắp xếp theo vị trí thực tế của bạn.
             </p>
           </div>
           <button
@@ -189,6 +219,7 @@ const userPos = computed(() =>
             :disabled="locating"
             @click="detectMyLocation"
           >
+            <i class="pi pi-map-marker mr-1" />
             {{ locating ? 'Đang định vị...' : 'Lấy vị trí' }}
           </button>
         </div>
@@ -257,16 +288,24 @@ const userPos = computed(() =>
             {{ selectedPoint.address }}
           </p>
           <p class="mb-5 flex items-center text-sm text-slate-600">
-            <Icon name="heroicons:clock" class="mr-2 h-4 w-4 text-emerald-600" />
+            <i class="pi pi-clock mr-2 text-emerald-600" />
             {{ selectedPoint.openHours }}
           </p>
-          <button
-            type="button"
-            class="w-full rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-4 text-base font-semibold text-white shadow-lg shadow-emerald-500/20 active:opacity-95"
-            @click="confirmPoint"
-          >
-            Chọn điểm thu gom này
-          </button>
+          <div class="flex gap-2">
+            <Button
+              icon="pi pi-directions"
+              severity="secondary"
+              class="!rounded-2xl !px-5"
+              @click="openDirections(selectedPoint)"
+            />
+            <button
+              type="button"
+              class="flex-1 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-4 text-base font-semibold text-white shadow-lg shadow-emerald-500/20 active:opacity-95"
+              @click="confirmPoint"
+            >
+              Chọn điểm này
+            </button>
+          </div>
         </div>
 
         <p v-else class="mt-4 text-center text-sm text-slate-500">Chọn một điểm để xem chi tiết và xác nhận.</p>

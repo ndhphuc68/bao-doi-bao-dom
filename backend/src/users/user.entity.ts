@@ -47,6 +47,9 @@ export class User {
   @Column({ nullable: true })
   collectionPointId?: string | null;
 
+  @Column({ nullable: true })
+  phoneNumber?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

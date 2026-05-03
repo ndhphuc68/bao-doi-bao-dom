@@ -8,6 +8,7 @@ definePageMeta({
 })
 
 const name = ref('')
+const phone = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
@@ -43,7 +44,8 @@ const handleRegister = async () => {
     const res = await auth.register({
       email: email.value.trim(),
       password: password.value,
-      name: name.value.trim() || undefined
+      name: name.value.trim() || undefined,
+      phoneNumber: phone.value.trim() || undefined
     })
     const token = useCookie('auth_token')
     token.value = res.access_token
@@ -86,6 +88,21 @@ const handleRegister = async () => {
               v-model="name"
               type="text"
               placeholder="Nguyễn Văn A"
+              fluid
+              class="rounded-2xl"
+            />
+          </IconField>
+        </div>
+
+        <div>
+          <label for="register-phone" class="mb-2 block text-sm font-medium text-slate-800">Số điện thoại</label>
+          <IconField>
+            <InputIcon class="pi pi-phone !text-slate-400" />
+            <InputText
+              id="register-phone"
+              v-model="phone"
+              type="tel"
+              placeholder="0912345678"
               fluid
               class="rounded-2xl"
             />

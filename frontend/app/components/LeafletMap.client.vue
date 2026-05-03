@@ -4,6 +4,7 @@ import L from 'leaflet'
 type LatLngTuple = [number, number]
 
 type MapPoi = {
+  id: string
   lat: number
   lng: number
   title: string
@@ -17,6 +18,8 @@ function escapeHtml(s: string) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 }
+
+const emit = defineEmits(['marker-click'])
 
 const props = withDefaults(
   defineProps<{
@@ -102,7 +105,10 @@ function renderMarkers() {
     const boundsPts: L.LatLng[] = []
     for (const p of poiList) {
       const html = `<div class="leaflet-poi-popup text-sm"><strong>${escapeHtml(p.title)}</strong>${p.description ? `<br/><span class="text-slate-600">${escapeHtml(p.description)}</span>` : ''}</div>`
-      L.marker([p.lat, p.lng]).bindPopup(html).addTo(markersLayer!)
+      L.marker([p.lat, p.lng])
+        .bindPopup(html)
+        .on('click', () => emit('marker-click', p))
+        .addTo(markersLayer!)
       boundsPts.push(L.latLng(p.lat, p.lng))
     }
     const u = props.userPosition

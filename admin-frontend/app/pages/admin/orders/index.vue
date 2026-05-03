@@ -16,7 +16,7 @@ type Row = {
   scheduledDate: string
   scheduledTime: string
   collectionPoint?: { name?: string }
-  user?: { email?: string; name?: string }
+  user?: { email?: string; name?: string; phoneNumber?: string }
 }
 
 const token = useCookie('admin_auth_token')
@@ -123,16 +123,53 @@ function returnStatusClass(st?: string | null): string {
 function clearDate() {
   createdDate.value = ''
 }
+
+function exportOrders() {
+  if (!rows.value?.length) return
+  const headers = ['Mã đơn', 'Thiết bị', 'Loại', 'Khách hàng', 'Email', 'SĐT', 'Ngày lấy', 'Trạng thái thu gom', 'Trạng thái hoàn trả']
+  const csvRows = rows.value.map(r => [
+    r.trackingCode,
+    r.deviceName,
+    r.deviceType,
+    r.user?.name || '',
+    r.user?.email || '',
+    r.user?.phoneNumber || '',
+    `${r.scheduledDate} ${r.scheduledTime}`,
+    recyclingStatusLabel(r.status),
+    returnStatusLabel(r.returnStatus)
+  ])
+  
+  const csvContent = [headers, ...csvRows]
+    .map(e => e.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(','))
+    .join('\n')
+    
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute('download', `danh_sach_don_hang_${new Date().toISOString().slice(0, 10)}.csv`)
+  link.click()
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-5">
-    <div>
-      <h1 class="text-xl font-bold tracking-tight">Đơn</h1>
-      <p class="text-sm text-slate-600">
-        Danh sách đơn thu gom. Nếu có yêu cầu hoàn trả thì sẽ hiển thị trạng thái xử lý và cho phép vào chi tiết để xác nhận/từ chối.
-      </p>
-    </div>
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">Đơn</h1>
+          <p class="text-sm text-slate-600">
+            Danh sách đơn thu gom. Nếu có yêu cầu hoàn trả thì sẽ hiển thị trạng thái xử lý và cho phép vào chi tiết để xác nhận/từ chối.
+          </p>
+        </div>
+        <Button 
+          icon="pi pi-download" 
+          label="Xuất CSV" 
+          outlined 
+          size="small" 
+          class="!rounded-xl"
+          :disabled="!rows?.length"
+          @click="exportOrders"
+        />
+      </div>
 
     <div class="rounded-2xl border border-emerald-200/80 bg-emerald-50/40 p-4 shadow-sm">
       <div class="mb-3 text-xs font-semibold uppercase tracking-wide text-emerald-900/70">Bộ lọc</div>
@@ -222,6 +259,7 @@ function clearDate() {
               <td class="px-4 py-3">
                 <div class="font-semibold text-slate-900">{{ r.user?.name || '—' }}</div>
                 <div class="text-xs text-slate-500">{{ r.user?.email || '—' }}</div>
+                <div v-if="r.user?.phoneNumber" class="text-[10px] text-emerald-600 font-medium">{{ r.user.phoneNumber }}</div>
               </td>
               <td class="px-4 py-3 text-slate-700">{{ r.scheduledDate }} · {{ r.scheduledTime }}</td>
               <td class="px-4 py-3">

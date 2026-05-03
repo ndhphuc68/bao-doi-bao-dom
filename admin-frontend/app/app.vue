@@ -4,7 +4,7 @@ import Toast from 'primevue/toast'
 
 <template>
   <div class="min-h-[100dvh] bg-slate-50 text-slate-900">
-    <Toast />
+    <Toast position="top-center" />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

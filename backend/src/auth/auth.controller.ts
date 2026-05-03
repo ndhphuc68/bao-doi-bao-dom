@@ -1,4 +1,4 @@
-import { Controller, Request, Post, Body, UnauthorizedException, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Request, Post, Body, UnauthorizedException, Get, UseGuards, Req, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -30,5 +30,11 @@ export class AuthController {
   @Get('point-ledger')
   getPointLedger(@Req() req) {
     return this.authService.getPointLedgerSummary(req.user.userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('profile')
+  updateProfile(@Req() req, @Body() body: { name?: string; phoneNumber?: string }) {
+    return this.authService.updateProfile(req.user.userId, body);
   }
 }

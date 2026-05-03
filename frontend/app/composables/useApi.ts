@@ -34,10 +34,20 @@ export function useApi() {
     baseURL,
     apiFetch,
     auth: {
-      register: (body: { email: string; password: string; name?: string }) =>
+      register: (body: { email: string; password: string; name?: string; phoneNumber?: string }) =>
         apiFetch<AuthTokenResponse>('/auth/register', { method: 'POST', body }),
       login: (body: { email: string; password: string }) =>
         apiFetch<AuthTokenResponse>('/auth/login', { method: 'POST', body }),
+      profile: (token: string) =>
+        apiFetch<any>('/auth/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      updateProfile: (token: string, body: { name?: string; phoneNumber?: string }) =>
+        apiFetch<any>('/auth/profile', {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` },
+          body
+        }),
       pointLedger: (token: string) =>
         apiFetch<PointLedgerSummary>('/auth/point-ledger', {
           headers: { Authorization: `Bearer ${token}` }
@@ -84,6 +94,40 @@ export function useApi() {
           headers: { Authorization: `Bearer ${token}` }
         })
       }
+    },
+    notifications: {
+      list: (token: string) =>
+        apiFetch<any[]>('/notifications', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      unreadCount: (token: string) =>
+        apiFetch<number>('/notifications/unread-count', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      markRead: (token: string, id: string) =>
+        apiFetch<any>(`/notifications/${id}/read`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      markAllRead: (token: string) =>
+        apiFetch<any>('/notifications/read-all', {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        })
+    },
+    community: {
+      leaderboard: (token: string) =>
+        apiFetch<any[]>('/community/leaderboard', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      stats: (token: string) =>
+        apiFetch<any>('/community/stats', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      feed: (token: string) =>
+        apiFetch<any[]>('/community/feed', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
     }
   }
 }

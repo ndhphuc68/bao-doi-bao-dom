@@ -87,4 +87,13 @@ export class UsersService {
     user.points += points;
     return this.usersRepository.save(user);
   }
+
+  async getLeaderboard() {
+    return this.usersRepository.find({
+      select: ['id', 'name', 'points'],
+      where: { role: UserRole.USER },
+      order: { points: 'DESC' },
+      take: 10,
+    });
+  }
 }

@@ -8,6 +8,8 @@ import { UserPointLedgerService } from '../users/user-point-ledger.service';
 import { PointLedgerReason } from '../users/user-point-ledger.entity';
 import type { AdminScope } from '../common/admin-scope.util';
 import { WarehouseItem } from '../warehouse/warehouse-item.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/notification.entity';
 
 export type RecyclingDashboardTrendPoint = {
   monthIndex: number;
@@ -62,6 +64,7 @@ export class RecyclingRequestsService {
     @InjectRepository(WarehouseItem)
     private warehouseRepo: Repository<WarehouseItem>,
     private pointLedgerService: UserPointLedgerService,
+    private notifications: NotificationsService,
   ) {}
 
   async create(
@@ -234,8 +237,26 @@ export class RecyclingRequestsService {
           });
           await em.save(w);
         }
+        
+        if (row.userId) {
+          await this.notifications.create(row.userId, {
+            title: 'Đơn hàng được chấp nhận',
+            message: `Yêu cầu thu gom ${row.trackingCode} đã được phê duyệt và nhập kho. Bạn nhận được ${ORDER_APPROVAL_POINTS} điểm!`,
+            type: NotificationType.SUCCESS,
+            relatedId: row.id
+          });
+        }
       } else {
         row.returnStatus = ReturnFlowStatus.REJECTED;
+        
+        if (row.userId) {
+          await this.notifications.create(row.userId, {
+            title: 'Đơn hàng bị từ chối',
+            message: `Yêu cầu thu gom ${row.trackingCode} đã bị từ chối. Vui lòng kiểm tra lại thiết bị hoặc thông tin đăng ký.`,
+            type: NotificationType.WARN,
+            relatedId: row.id
+          });
+        }
       }
 
       return em.save(row);
@@ -405,5 +426,26 @@ export class RecyclingRequestsService {
       trend,
       groups,
     };
+  }
+
+  async countTotalStoredDevices() {
+    return this.requestsRepository.count({ where: { status: RequestStatus.STORED } });
+  }
+
+  async countUniqueUsers() {
+    const res = await this.requestsRepository
+      .createQueryBuilder('rr')
+      .select('COUNT(DISTINCT rr.userId)', 'cnt')
+      .getRawOne();
+    return parseInt(res.cnt || '0', 10);
+  }
+
+  async findRecentCompleted(limit = 5) {
+    return this.requestsRepository.find({
+      where: { status: RequestStatus.STORED },
+      order: { createdAt: 'DESC' },
+      take: limit,
+      relations: ['user'],
+    });
   }
 }

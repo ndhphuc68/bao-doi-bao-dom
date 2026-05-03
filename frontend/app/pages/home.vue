@@ -57,6 +57,10 @@ function excerptFromBody(body: string, max = 120) {
 
 const { data: posts, pending: postsPending } = await useAsyncData('waste_posts_home', () => wastePosts.list())
 
+const { data: unreadCount } = await useAsyncData('unread_notifications_count', () => 
+  useCookie('auth_token').value ? useApi().notifications.unreadCount(useCookie('auth_token').value!) : Promise.resolve(0)
+)
+
 const homeArticles = computed(() => (posts.value || []).slice(0, 4))
 
 function joinCampaign() {
@@ -82,7 +86,22 @@ function joinCampaign() {
           <p class="text-xs text-slate-500">Eco · Đà Nẵng</p>
         </div>
       </div>
-      <Button icon="pi pi-bell" rounded text severity="secondary" aria-label="Thông báo" />
+      <div class="relative">
+        <Button 
+          icon="pi pi-bell" 
+          rounded 
+          text 
+          severity="secondary" 
+          aria-label="Thông báo" 
+          @click="router.push('/notifications')"
+        />
+        <div 
+          v-if="unreadCount > 0"
+          class="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white ring-2 ring-white"
+        >
+          {{ unreadCount > 99 ? '99+' : unreadCount }}
+        </div>
+      </div>
     </header>
 
     <main class="flex-1 overflow-y-auto px-4 pb-28 pt-2">

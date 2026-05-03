@@ -11,6 +11,8 @@ import { ReturnRequestsModule } from './return-requests/return-requests.module';
 import { WastePostsModule } from './waste-posts/waste-posts.module';
 import { SchemaPatchService } from './database/schema-patch.service';
 import { WarehouseModule } from './warehouse/warehouse.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { CommunityModule } from './community/community.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { WarehouseModule } from './warehouse/warehouse.module';
     UploadsModule,
     WarehouseModule,
     WastePostsModule,
+    NotificationsModule,
+    CommunityModule,
   ],
   controllers: [AppController],
   providers: [AppService, SchemaPatchService],

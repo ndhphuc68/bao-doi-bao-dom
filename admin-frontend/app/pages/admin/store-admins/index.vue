@@ -12,6 +12,7 @@ type StoreAdmin = {
   email: string
   name: string
   role: string
+  phoneNumber?: string
   collectionPointId?: string | null
   collectionPoint?: { id: string; name: string } | null
 }
@@ -102,6 +103,7 @@ const submit = async () => {
             <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
               <th class="px-4 py-3">Email</th>
               <th class="px-4 py-3">Tên</th>
+              <th class="px-4 py-3">SĐT</th>
               <th class="px-4 py-3">Cửa hàng</th>
             </tr>
           </thead>
@@ -109,6 +111,7 @@ const submit = async () => {
             <tr v-for="r in rows" :key="r.id" class="hover:bg-slate-50">
               <td class="px-4 py-3">{{ r.email }}</td>
               <td class="px-4 py-3">{{ r.name }}</td>
+              <td class="px-4 py-3 text-slate-600 font-mono text-xs">{{ r.phoneNumber || '—' }}</td>
               <td class="px-4 py-3">{{ r.collectionPoint?.name || r.collectionPointId || '—' }}</td>
             </tr>
           </tbody>

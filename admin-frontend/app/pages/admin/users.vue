@@ -8,6 +8,7 @@ type UserRow = {
   id: string
   email: string
   name: string
+  phoneNumber?: string
   points: number
   role: string
   collectionPointId?: string | null
@@ -39,6 +40,7 @@ const { data: rows, pending } = await useAsyncData('admin_all_users', () =>
             <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
               <th class="px-4 py-3">Email</th>
               <th class="px-4 py-3">Tên</th>
+              <th class="px-4 py-3">SĐT</th>
               <th class="px-4 py-3">Điểm</th>
               <th class="px-4 py-3">Vai trò</th>
             </tr>
@@ -47,6 +49,7 @@ const { data: rows, pending } = await useAsyncData('admin_all_users', () =>
             <tr v-for="u in rows" :key="u.id" class="hover:bg-slate-50">
               <td class="px-4 py-3">{{ u.email }}</td>
               <td class="px-4 py-3">{{ u.name }}</td>
+              <td class="px-4 py-3 text-slate-600 font-mono text-xs">{{ u.phoneNumber || '—' }}</td>
               <td class="px-4 py-3">{{ u.points }}</td>
               <td class="px-4 py-3 font-mono text-xs">{{ u.role }}</td>
             </tr>

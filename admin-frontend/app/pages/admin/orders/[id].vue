@@ -23,7 +23,7 @@ type AdminOrder = {
   returnAdminNote?: string | null
   returnDecidedAt?: string | null
   createdAt: string
-  user?: { id: string; email?: string; name?: string }
+  user?: { id: string; email?: string; name?: string; phoneNumber?: string }
 }
 
 const route = useRoute()
@@ -172,6 +172,7 @@ const doDecision = async (decision: 'APPROVE' | 'REJECT') => {
               <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Khách hàng</div>
               <div class="mt-1 text-sm font-semibold text-slate-900">{{ order.user?.name || '—' }}</div>
               <div class="text-sm text-slate-600">{{ order.user?.email || '—' }}</div>
+              <div v-if="order.user?.phoneNumber" class="mt-0.5 text-xs text-emerald-600 font-medium">{{ order.user.phoneNumber }}</div>
             </div>
             <div class="rounded-xl bg-slate-50 p-3">
               <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Lịch hẹn</div>

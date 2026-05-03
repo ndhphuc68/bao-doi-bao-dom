@@ -7,10 +7,12 @@ import { AdminRecyclingRequestsController } from './admin-recycling-requests.con
 import { AdminStatsController } from './admin-stats.controller';
 import { WarehouseItem } from '../warehouse/warehouse-item.entity';
 import { UsersModule } from '../users/users.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RecyclingRequest, WarehouseItem]), UsersModule],
+  imports: [TypeOrmModule.forFeature([RecyclingRequest, WarehouseItem]), UsersModule, NotificationsModule],
   controllers: [RecyclingRequestsController, AdminRecyclingRequestsController, AdminStatsController],
   providers: [RecyclingRequestsService],
+  exports: [RecyclingRequestsService],
 })
 export class RecyclingRequestsModule {}

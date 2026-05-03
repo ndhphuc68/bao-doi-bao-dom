@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useToast } from 'primevue/usetoast'
 import type { PointLedgerEntry, PointLedgerReason } from '~/types/api'
 
 definePageMeta({ middleware: ['require-auth'] })
@@ -6,6 +7,7 @@ definePageMeta({ middleware: ['require-auth'] })
 const config = useRuntimeConfig()
 const token = useCookie('auth_token')
 const { auth } = useApi()
+const toast = useToast()
 
 const {
   data: summary,
@@ -19,6 +21,78 @@ const {
     watch: [token]
   }
 )
+
+const hardcodedRewards = [
+  {
+    id: '1',
+    title: 'Voucher Highland 20k',
+    description: 'Áp dụng cho toàn bộ menu tại các cửa hàng Highland Coffee.',
+    points: 200,
+    image: '/images/rewards/voucher.png',
+    category: 'Voucher'
+  },
+  {
+    id: '2',
+    title: 'Túi vải Eco Friendly',
+    description: 'Túi vải Canvas chất lượng cao, bền bỉ và bảo vệ môi trường.',
+    points: 500,
+    image: '/images/rewards/tote_bag.png',
+    category: 'Sản phẩm'
+  },
+  {
+    id: '3',
+    title: 'Bình giữ nhiệt Bao Doi',
+    description: 'Bình inox 304 cao cấp, giữ nhiệt 12h, thiết kế tối giản.',
+    points: 1500,
+    image: '/images/rewards/bottle.png',
+    category: 'Sản phẩm'
+  },
+  {
+    id: '4',
+    title: 'Mã giảm giá Grab 50k',
+    description: 'Áp dụng cho dịch vụ GrabCar hoặc GrabBike trên toàn quốc.',
+    points: 1000,
+    image: '/images/rewards/grab_voucher.png',
+    category: 'Voucher'
+  },
+  {
+    id: '5',
+    title: 'Sổ tay tái chế',
+    description: 'Sổ tay làm từ giấy tái chế 100%, bìa cứng kraft thân thiện.',
+    points: 300,
+    image: '/images/rewards/notebook.png',
+    category: 'Sản phẩm'
+  },
+  {
+    id: '6',
+    title: 'Bộ ống hút tre',
+    description: 'Bộ 5 ống hút tre tự nhiên kèm cọ rửa và túi vải đựng.',
+    points: 150,
+    image: '/images/rewards/straws.png',
+    category: 'Sản phẩm'
+  }
+]
+
+function handleRedeem(reward: any) {
+  const currentPoints = summary.value?.points ?? 0
+  if (currentPoints < reward.points) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Không đủ điểm',
+      detail: 'Bạn cần tích lũy thêm điểm để đổi quà này.',
+      life: 3000
+    })
+    return
+  }
+
+  // Tạm thời chỉ hiển thị thành công
+  toast.add({
+    severity: 'success',
+    summary: 'Đổi quà thành công',
+    detail: `Bạn đã đổi thành công ${reward.title}. Kiểm tra email để nhận mã!`,
+    life: 5000
+  })
+}
 
 function reasonLabel(reason: PointLedgerReason): string {
   const map: Record<PointLedgerReason, string> = {
@@ -55,6 +129,7 @@ function orderHint(entry: PointLedgerEntry): string | null {
     <AppPageHeader title="Điểm thưởng" />
 
     <div class="px-5 pt-4">
+      <!-- Points Card -->
       <div
         class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 p-6 text-white shadow-[0_20px_50px_rgba(16,185,129,0.35)]"
       >
@@ -70,7 +145,27 @@ function orderHint(entry: PointLedgerEntry): string | null {
         </p>
       </div>
 
-      <div class="mt-6">
+      <!-- Redemption Section -->
+      <div class="mt-8">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-extrabold text-slate-900">Đổi quà hấp dẫn</h2>
+          <NuxtLink to="#" class="text-xs font-bold text-emerald-600 hover:underline">Xem tất cả</NuxtLink>
+        </div>
+        
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <ClientOnly>
+            <RewardCard
+              v-for="reward in hardcodedRewards"
+              :key="reward.id"
+              :reward="reward"
+              @redeem="handleRedeem"
+            />
+          </ClientOnly>
+        </div>
+      </div>
+
+      <!-- History Section -->
+      <div class="mt-8 pb-4">
         <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Lịch sử cộng điểm</h2>
 
         <div

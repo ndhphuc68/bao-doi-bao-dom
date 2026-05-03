@@ -4,8 +4,9 @@ const route = useRoute()
 const tabs = [
   { to: '/home', label: 'Trang chủ', icon: 'pi pi-home' },
   { to: '/recycle', label: 'Hoàn trả', icon: 'pi pi-sync' },
-  { to: '/profile', label: 'Hồ sơ', icon: 'pi pi-user' },
-  { to: '/rewards', label: 'Điểm thưởng', icon: 'pi pi-star' }
+  { to: '/community', label: 'Cộng đồng', icon: 'pi pi-users' },
+  { to: '/rewards', label: 'Ưu đãi', icon: 'pi pi-gift' },
+  { to: '/profile', label: 'Hồ sơ', icon: 'pi pi-user' }
 ]
 
 function isActive(path: string) {
