@@ -6,9 +6,10 @@ import { getApiErrorMessage } from '~/utils/api/errors'
 definePageMeta({
   middleware: ['redirect-if-logged-in']
 })
+useHead({ title: 'Đăng nhập' })
 
-const email = ref('demo@gmail.com')
-const password = ref('password123')
+const email = ref('')
+const password = ref('')
 const router = useRouter()
 const { auth } = useApi()
 const toast = useToast()
@@ -28,64 +29,107 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="relative flex w-full flex-col px-5 py-6 sm:px-7">
-    <div
-      class="pointer-events-none absolute right-0 top-0 h-28 w-28 rounded-full bg-emerald-100/80 blur-3xl"
-      aria-hidden="true"
-    />
-
-    <div class="relative mb-5 flex justify-center">
-      <div
-        class="flex h-36 w-36 items-center justify-center rounded-[2.5rem] bg-white p-3 shadow-sm ring-1 ring-slate-200/50"
-      >
-        <img src="/logo_splash.png" alt="Eco Logo" class="h-full w-full object-contain" />
+  <div class="flex min-h-[100dvh] w-full flex-col md:flex-row">
+    <!-- Left Side: PC Illustration & Branding -->
+    <div class="relative hidden w-1/2 flex-col items-center justify-center overflow-hidden bg-slate-900 md:flex">
+      <div class="absolute inset-0 z-0">
+        <img src="/banner_campaign.png" class="h-full w-full object-cover opacity-40 brightness-50" alt="Eco Background" />
+        <div class="absolute inset-0 bg-gradient-to-br from-emerald-600/80 via-slate-900/90 to-slate-950"></div>
+      </div>
+      
+      <div class="relative z-10 flex flex-col items-center px-12 text-center text-white">
+        <div class="mb-8 rounded-3xl bg-white p-5 shadow-2xl shadow-emerald-500/20 transition-transform hover:scale-105">
+          <img src="/logo_splash.png" alt="Eco Logo" class="h-24 w-24 object-contain" />
+        </div>
+        <h2 class="mb-4 text-4xl font-black tracking-tight lg:text-5xl">Kiến tạo tương lai xanh.</h2>
+        <p class="max-w-md text-lg font-medium text-emerald-50/80">
+          Tham gia cùng cộng đồng Eco tại Đà Nẵng để giảm thiểu rác thải điện tử và nhận những phần quà ý nghĩa.
+        </p>
+        
+        <div class="mt-12 grid grid-cols-2 gap-12">
+          <div class="text-left">
+            <p class="text-4xl font-black text-emerald-400">1.2k+</p>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-100/60">Thiết bị thu hồi</p>
+          </div>
+          <div class="text-left">
+            <p class="text-4xl font-black text-emerald-400">500kg</p>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-100/60">CO2 giảm thiểu</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="relative flex flex-col gap-5">
-      <div>
-        <h1 class="mb-1 text-center text-2xl font-bold tracking-tight text-slate-900">Chào mừng bạn</h1>
-        <p class="text-center text-sm leading-snug text-slate-600">Đăng nhập để tiếp tục hành trình tái chế.</p>
-      </div>
-
-      <div class="flex flex-col gap-4">
-        <div>
-          <label for="login-email" class="mb-2 block text-sm font-medium text-slate-800">Số điện thoại hoặc Email</label>
-          <IconField>
-            <InputIcon class="pi pi-envelope !text-slate-400" />
-            <InputText
-              id="login-email"
-              v-model="email"
-              type="email"
-              placeholder="email@gmail.com"
-              fluid
-              class="rounded-2xl"
-            />
-          </IconField>
-        </div>
-
-        <div>
-          <label for="login-pass" class="mb-2 block text-sm font-medium text-slate-800">Mật khẩu</label>
-          <Password
-            id="login-pass"
-            v-model="password"
-            placeholder="••••••••"
-            :feedback="false"
-            toggle-mask
-            fluid
-            input-class="rounded-2xl"
-          />
-          <div class="mt-2 flex justify-end">
-            <Button label="Quên mật khẩu?" link class="!p-0 !text-xs" severity="secondary" />
+    <!-- Right Side: Form -->
+    <div class="flex flex-1 flex-col items-center justify-center bg-white px-6 py-12 md:bg-slate-50">
+      <div class="w-full max-w-md space-y-8 rounded-3xl bg-white p-2 md:p-10 md:shadow-[0_20px_60px_-15px_rgba(15,23,42,0.1)] md:ring-1 md:ring-slate-200/50">
+        <!-- Mobile Logo -->
+        <div class="md:hidden flex justify-center mb-8">
+          <div class="p-4 rounded-3xl bg-slate-50 ring-1 ring-slate-100">
+            <img src="/logo_splash.png" alt="Eco Logo" class="h-20 w-20 object-contain" />
           </div>
         </div>
 
-        <Button label="Đăng nhập" fluid rounded @click="handleLogin" />
+        <div class="text-center md:text-left">
+          <h1 class="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">Đăng nhập</h1>
+          <p class="mt-2 text-sm font-medium text-slate-500">Tiếp tục hành trình bảo vệ hành tinh cùng Eco.</p>
+        </div>
 
-        <p class="text-center text-sm text-slate-600">
-          Chưa có tài khoản?
-          <NuxtLink to="/register" class="ml-1 font-semibold text-emerald-600 hover:underline">Đăng ký ngay</NuxtLink>
-        </p>
+        <div class="space-y-6">
+          <div class="space-y-2">
+            <label for="login-email" class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-1">Tài khoản</label>
+            <IconField>
+              <InputIcon class="pi pi-envelope !text-slate-400" />
+              <InputText
+                id="login-email"
+                v-model="email"
+                type="email"
+                placeholder="Email hoặc số điện thoại"
+                fluid
+                class="!rounded-2xl !py-4 !pl-12 !border-slate-100 !bg-slate-50/50 hover:!bg-white focus:!bg-white focus:!ring-emerald-500/20"
+              />
+            </IconField>
+          </div>
+
+          <div class="space-y-2">
+            <label for="login-pass" class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-1">Mật khẩu</label>
+            <Password
+              id="login-pass"
+              v-model="password"
+              placeholder="••••••••"
+              :feedback="false"
+              toggle-mask
+              fluid
+              input-class="!rounded-2xl !py-4 !border-slate-100 !bg-slate-50/50 hover:!bg-white focus:!bg-white"
+            />
+            <div class="flex justify-end pt-1">
+              <Button label="Quên mật khẩu?" link class="!p-0 !text-xs !font-bold !text-slate-400 hover:!text-emerald-600" severity="secondary" />
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <Button
+              label="Đăng nhập"
+              fluid
+              rounded
+              class="!py-4 !text-base !font-black shadow-xl shadow-emerald-500/20"
+              @click="handleLogin"
+            />
+          </div>
+
+          <div class="relative py-4">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+              <div class="w-full border-t border-slate-100"></div>
+            </div>
+            <div class="relative flex justify-center text-xs font-black uppercase tracking-widest">
+              <span class="bg-white px-4 text-slate-300">hoặc tham gia</span>
+            </div>
+          </div>
+
+          <p class="text-center text-sm font-medium text-slate-500">
+            Bạn mới biết đến Eco?
+            <NuxtLink to="/register" class="ml-1 font-black text-emerald-600 hover:underline">Đăng ký ngay</NuxtLink>
+          </p>
+        </div>
       </div>
     </div>
   </div>

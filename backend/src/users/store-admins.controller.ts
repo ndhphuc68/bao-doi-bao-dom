@@ -12,7 +12,8 @@ import { SuperAdminGuard } from '../common/guards/super-admin.guard';
 import { CollectionPointsService } from '../collection-points/collection-points.service';
 import { UsersService } from './users.service';
 import { UserRole } from './user.entity';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Delete } from '@nestjs/common';
+import { UserPointLedgerService } from './user-point-ledger.service';
 import type { User } from './user.entity';
 
 function omitPassword<T extends User>(u: T): Omit<T, 'password'> {
@@ -26,6 +27,7 @@ export class StoreAdminsController {
   constructor(
     private readonly users: UsersService,
     private readonly points: CollectionPointsService,
+    private readonly ledger: UserPointLedgerService,
   ) {}
 
   @Get('admin/users')
@@ -86,5 +88,28 @@ export class StoreAdminsController {
     if (body.role !== undefined) patch.role = body.role;
     const updated = await this.users.updateAdminUser(id, patch);
     return omitPassword(updated);
+  }
+
+  @Get('admin/users/:id/points')
+  async getUserPoints(@Param('id') id: string) {
+    return this.ledger.getSummaryForUser(id);
+  }
+
+  @Patch('admin/users/:id')
+  async updateUserInfo(
+    @Param('id') id: string,
+    @Body() body: { name?: string; phoneNumber?: string },
+  ) {
+    const patch: any = {};
+    if (body.name !== undefined) patch.name = body.name;
+    if (body.phoneNumber !== undefined) patch.phoneNumber = body.phoneNumber;
+    const updated = await this.users.updateAdminUser(id, patch);
+    return omitPassword(updated);
+  }
+
+  @Delete('admin/users/:id')
+  async deleteUser(@Param('id') id: string) {
+    await this.users.deleteUser(id);
+    return { success: true };
   }
 }

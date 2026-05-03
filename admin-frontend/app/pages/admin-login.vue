@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { getApiErrorMessage } from '~/utils/api/errors'
 
-const email = ref('demo@gmail.com')
-const password = ref('password123')
+const email = ref('')
+const password = ref('')
 const router = useRouter()
 const toast = useToast()
 const { apiFetch } = useApi()

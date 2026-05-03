@@ -3,6 +3,7 @@ import { useToast } from 'primevue/usetoast'
 import type { PointLedgerEntry, PointLedgerReason } from '~/types/api'
 
 definePageMeta({ middleware: ['require-auth'] })
+useHead({ title: 'Đổi thưởng' })
 
 const config = useRuntimeConfig()
 const token = useCookie('auth_token')
@@ -73,7 +74,7 @@ const hardcodedRewards = [
   }
 ]
 
-function handleRedeem(reward: any) {
+async function handleRedeem(reward: any) {
   const currentPoints = summary.value?.points ?? 0
   if (currentPoints < reward.points) {
     toast.add({
@@ -85,19 +86,42 @@ function handleRedeem(reward: any) {
     return
   }
 
-  // Tạm thời chỉ hiển thị thành công
-  toast.add({
-    severity: 'success',
-    summary: 'Đổi quà thành công',
-    detail: `Bạn đã đổi thành công ${reward.title}. Kiểm tra email để nhận mã!`,
-    life: 5000
-  })
+  try {
+    await auth.redeem(token.value || '', {
+      rewardTitle: reward.title,
+      points: reward.points
+    })
+
+    toast.add({
+      severity: 'success',
+      summary: 'Đổi quà thành công',
+      detail: `Bạn đã đổi thành công ${reward.title}. Kiểm tra email để nhận mã!`,
+      life: 5000
+    })
+
+    // Refresh points summary and global profile data
+    await Promise.all([
+      refresh(),
+      refreshNuxtData('auth_profile'),
+      refreshNuxtData('desktop_unread_notifications')
+    ])
+    // The profile in header uses useFetch without a key, so we might need a key or refresh by URL
+    // Actually, refreshNuxtData works with keys. Let's ensure AppDesktopHeader uses a key.
+  } catch (err) {
+    toast.add({
+      severity: 'error',
+      summary: 'Lỗi',
+      detail: 'Không thể thực hiện đổi quà. Vui lòng thử lại sau.',
+      life: 3500
+    })
+  }
 }
 
 function reasonLabel(reason: PointLedgerReason): string {
   const map: Record<PointLedgerReason, string> = {
     SIGNUP: 'Thưởng đăng ký tài khoản',
-    ORDER_APPROVED: 'Đơn được admin xác nhận'
+    ORDER_APPROVED: 'Đơn được admin xác nhận',
+    REDEEM: 'Đổi quà tặng'
   }
   return map[reason] ?? reason
 }
@@ -127,6 +151,10 @@ function orderHint(entry: PointLedgerEntry): string | null {
 <template>
   <div class="min-h-[100dvh] bg-slate-50 pb-28">
     <AppPageHeader title="Điểm thưởng" />
+    <div class="hidden md:block px-8 py-6">
+      <h1 class="text-2xl font-extrabold text-slate-900">Ưu đãi & Điểm thưởng</h1>
+      <p class="text-sm text-slate-500">Tích lũy điểm xanh và đổi những phần quà hấp dẫn từ Eco</p>
+    </div>
 
     <div class="px-5 pt-4">
       <!-- Points Card -->
@@ -152,7 +180,7 @@ function orderHint(entry: PointLedgerEntry): string | null {
           <NuxtLink to="#" class="text-xs font-bold text-emerald-600 hover:underline">Xem tất cả</NuxtLink>
         </div>
         
-        <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
           <ClientOnly>
             <RewardCard
               v-for="reward in hardcodedRewards"
@@ -196,10 +224,11 @@ function orderHint(entry: PointLedgerEntry): string | null {
             class="flex gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-sm"
           >
             <div
-              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-amber-600"
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
+              :class="e.amount > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'"
               aria-hidden="true"
             >
-              <i class="pi pi-plus text-sm font-bold" />
+              <i :class="[e.amount > 0 ? 'pi pi-plus' : 'pi pi-gift', 'text-sm font-bold']" />
             </div>
             <div class="min-w-0 flex-1">
               <p class="text-sm font-bold text-slate-900">{{ reasonLabel(e.reason) }}</p>
@@ -207,7 +236,12 @@ function orderHint(entry: PointLedgerEntry): string | null {
               <p class="mt-1 text-xs text-slate-400">{{ formatWhen(e.createdAt) }}</p>
             </div>
             <div class="shrink-0 text-right">
-              <p class="text-base font-extrabold tabular-nums text-emerald-600">+{{ e.amount }}</p>
+              <p 
+                class="text-base font-extrabold tabular-nums"
+                :class="e.amount > 0 ? 'text-emerald-600' : 'text-rose-600'"
+              >
+                {{ e.amount > 0 ? '+' : '' }}{{ e.amount }}
+              </p>
               <p class="text-[10px] font-semibold uppercase text-slate-400">điểm</p>
             </div>
           </li>

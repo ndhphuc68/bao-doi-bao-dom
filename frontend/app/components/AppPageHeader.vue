@@ -7,7 +7,7 @@ defineProps<{
 
 <template>
   <header
-    class="sticky top-0 z-20 flex items-center gap-1 border-b border-slate-200/80 bg-white/90 px-2 py-2 backdrop-blur-md sm:px-3"
+    class="sticky top-0 z-20 flex items-center gap-1 border-b border-slate-200/80 bg-white/90 px-2 py-2 backdrop-blur-md sm:px-3 md:hidden"
   >
     <NuxtLink v-if="backTo" :to="backTo" class="shrink-0" aria-label="Quay lại">
       <Button v-ripple icon="pi pi-arrow-left" rounded text severity="secondary" />

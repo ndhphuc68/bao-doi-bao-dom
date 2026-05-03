@@ -2,6 +2,7 @@
 import { getApiErrorMessage } from '~/utils/api/errors'
 
 definePageMeta({ middleware: ['require-auth'] })
+useHead({ title: 'Thông báo' })
 
 const token = useCookie('auth_token')
 const { notifications } = useApi()

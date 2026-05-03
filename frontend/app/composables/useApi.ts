@@ -51,6 +51,12 @@ export function useApi() {
       pointLedger: (token: string) =>
         apiFetch<PointLedgerSummary>('/auth/point-ledger', {
           headers: { Authorization: `Bearer ${token}` }
+        }),
+      redeem: (token: string, body: { rewardTitle: string; points: number }) =>
+        apiFetch<any>('/auth/redeem', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body
         })
     },
     collectionPoints: {

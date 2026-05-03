@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { UserPointLedgerService } from '../users/user-point-ledger.service';
 import { JwtService } from '@nestjs/jwt';
@@ -18,7 +18,7 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
-    if (user && await bcrypt.compare(pass, user.password || '')) {
+    if (user && (await bcrypt.compare(pass, user.password || ''))) {
       const { password, ...result } = user;
       return result;
     }
@@ -42,14 +42,14 @@ export class AuthService {
     };
     return {
       access_token: this.jwtService.sign(payload),
-      user
+      user,
     };
   }
 
   async register(body: any) {
     const existing = await this.usersService.findOneByEmail(body.email);
     if (existing) {
-        throw new UnauthorizedException('Email already exists. Try logging in.');
+      throw new UnauthorizedException('Email already exists. Try logging in.');
     }
     const hashedPassword = await bcrypt.hash(body.password, 10);
     const signupPoints = 400;
@@ -88,4 +88,28 @@ export class AuthService {
     const { password, ...rest } = updated;
     return rest;
   }
+
+  async redeemPoints(userId: string, body: { rewardTitle: string; points: number }) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException();
+
+    if (user.points < body.points) {
+      throw new BadRequestException('Insufficient points');
+    }
+
+    return this.dataSource.transaction(async (em) => {
+      const repo = em.getRepository(User);
+      user.points -= body.points;
+      await repo.save(user);
+
+      await this.pointLedgerService.appendTransactional(em, {
+        userId: user.id,
+        amount: -body.points,
+        reason: PointLedgerReason.REDEEM,
+      });
+
+      return { success: true, remainingPoints: user.points };
+    });
+  }
 }
+

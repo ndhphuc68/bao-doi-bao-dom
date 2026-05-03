@@ -11,6 +11,7 @@ import { User } from './user.entity';
 export enum PointLedgerReason {
   SIGNUP = 'SIGNUP',
   ORDER_APPROVED = 'ORDER_APPROVED',
+  REDEEM = 'REDEEM',
 }
 
 @Entity('user_point_ledger')

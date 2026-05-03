@@ -1,5 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['require-auth'] })
+useHead({ title: 'Cộng đồng' })
 
 const token = useCookie('auth_token')
 const { community } = useApi()
@@ -29,7 +30,7 @@ function formatTime(iso: string) {
 <template>
   <div class="min-h-[100dvh] bg-slate-50 pb-28">
     <!-- Header -->
-    <div class="sticky top-0 z-20 bg-emerald-600 px-5 pb-10 pt-4 text-white shadow-lg">
+    <div class="sticky top-0 z-20 bg-emerald-600 px-5 pb-10 pt-4 text-white shadow-lg md:hidden">
       <div class="flex items-center justify-between">
         <h1 class="text-xl font-extrabold tracking-tight">Cộng đồng Eco</h1>
         <NuxtLink to="/rewards" class="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold backdrop-blur-md">
@@ -56,7 +57,31 @@ function formatTime(iso: string) {
       </div>
     </div>
 
-    <div class="relative -mt-6 rounded-t-[32px] bg-slate-50 px-5 pt-8">
+    <!-- Desktop Title and Stats -->
+    <div class="hidden md:block px-8 py-6">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-900">Cộng đồng Eco</h1>
+          <p class="text-sm text-slate-500">Cùng nhau kiến tạo một tương lai xanh hơn tại Đà Nẵng</p>
+        </div>
+        <div class="flex gap-4">
+          <div class="bg-white px-6 py-4 rounded-3xl border border-slate-100 shadow-sm text-center min-w-[140px]">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Thiết bị</p>
+            <p class="text-2xl font-black text-emerald-600">{{ stats?.totalDevices || 0 }}</p>
+          </div>
+          <div class="bg-white px-6 py-4 rounded-3xl border border-slate-100 shadow-sm text-center min-w-[140px]">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">CO2 Giảm</p>
+            <p class="text-2xl font-black text-emerald-600">{{ stats?.co2Saved?.toFixed(1) || 0 }}kg</p>
+          </div>
+          <div class="bg-white px-6 py-4 rounded-3xl border border-slate-100 shadow-sm text-center min-w-[140px]">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Eco-ers</p>
+            <p class="text-2xl font-black text-emerald-600">{{ stats?.totalUsers || 0 }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative rounded-t-[32px] bg-slate-50 px-5 pt-2 md:pt-0 md:-mt-0">
       <!-- Activity Feed -->
       <div class="mb-8">
         <div class="mb-4 flex items-center justify-between px-1">

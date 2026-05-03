@@ -1,5 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['require-auth'] })
+useHead({ title: 'Hồ sơ' })
 
 const config = useRuntimeConfig()
 const token = useCookie('auth_token')
@@ -76,6 +77,10 @@ function logout() {
 <template>
   <div class="min-h-[100dvh] bg-slate-50 pb-28">
     <AppPageHeader title="Hồ sơ cá nhân" />
+    <div class="hidden md:block px-8 py-6">
+      <h1 class="text-2xl font-extrabold text-slate-900">Hồ sơ cá nhân</h1>
+      <p class="text-sm text-slate-500">Quản lý thông tin tài khoản và hoạt động của bạn</p>
+    </div>
 
     <div class="px-5 pt-4">
       <div class="flex flex-col items-center text-center">

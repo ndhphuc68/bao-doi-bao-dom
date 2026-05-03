@@ -13,17 +13,16 @@ function formatAmount(n: number) {
 function getReasonLabel(reason: string) {
   const map: Record<string, string> = {
     SIGNUP: 'Thành viên mới',
-    ORDER_COMPLETED: 'Hoàn trả thiết bị',
-    REWARD_REDEEMED: 'Đổi quà tặng',
-    ADMIN_ADJUST: 'Điều chỉnh bởi Admin'
+    ORDER_APPROVED: 'Hoàn trả thiết bị',
+    REDEEM: 'Đổi quà tặng'
   }
   return map[reason] ?? reason
 }
 
 function getReasonIcon(reason: string) {
   if (reason === 'SIGNUP') return 'pi pi-user-plus text-emerald-500'
-  if (reason === 'ORDER_COMPLETED') return 'pi pi-sync text-emerald-500'
-  if (reason === 'REWARD_REDEEMED') return 'pi pi-gift text-amber-500'
+  if (reason === 'ORDER_APPROVED') return 'pi pi-sync text-emerald-500'
+  if (reason === 'REDEEM') return 'pi pi-gift text-amber-500'
   return 'pi pi-info-circle text-slate-400'
 }
 

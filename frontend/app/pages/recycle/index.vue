@@ -25,6 +25,10 @@ function goNewRequest() {
 <template>
   <div class="flex min-h-0 flex-1 flex-col bg-slate-50">
     <AppPageHeader title="Hoàn trả" back-to="/home" />
+    <div class="hidden md:block px-8 py-6">
+      <h1 class="text-2xl font-extrabold text-slate-900">Hoàn trả thiết bị</h1>
+      <p class="text-sm text-slate-500">Quản lý các đơn hoàn trả và đặt lịch thu gom mới</p>
+    </div>
 
     <div class="flex-1 overflow-y-auto px-4 pb-28 pt-2">
       <div class="mb-5 rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 px-5 py-5 text-white shadow-lg shadow-emerald-900/15">

@@ -18,7 +18,7 @@ function isActive(path: string) {
 
 <template>
   <nav
-    class="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-slate-200/90 bg-white/95 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] pt-2 shadow-[0_-8px_30px_rgba(15,23,42,0.06)] backdrop-blur-md"
+    class="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-slate-200/90 bg-white/95 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] pt-2 shadow-[0_-8px_30px_rgba(15,23,42,0.06)] backdrop-blur-md md:hidden"
     aria-label="Điều hướng chính"
   >
     <div class="flex items-end justify-around px-1">

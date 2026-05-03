@@ -8,7 +8,7 @@ const { wastePosts } = useApi()
 const mediaUrl = useMediaUrl()
 
 useHead({
-  title: 'Eco - Tái chế điện tử'
+  title: 'Trang chủ'
 })
 
 const greeting = computed(() => {
@@ -71,7 +71,8 @@ function joinCampaign() {
 <template>
   <div class="flex min-h-0 flex-1 flex-col bg-slate-50">
     <!-- Header -->
-    <header class="sticky top-0 z-20 flex items-center justify-between bg-white/95 px-4 py-3 backdrop-blur-md">
+    <!-- Mobile Header: Hide on md -->
+    <header class="sticky top-0 z-20 flex items-center justify-between bg-white/95 px-4 py-3 backdrop-blur-md md:hidden">
       <div class="flex min-w-0 items-center gap-3">
         <Avatar
           image="/logo_splash.png"
@@ -137,7 +138,7 @@ function joinCampaign() {
       <!-- Lối tắt -->
       <div class="mb-6">
         <h3 class="mb-3 text-base font-bold text-slate-900">Lối tắt nhanh</h3>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
           <NuxtLink
             v-for="item in shortcuts"
             :key="item.to"
@@ -168,7 +169,7 @@ function joinCampaign() {
         <p v-else-if="!homeArticles.length" class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500">
           Chưa có bài viết. Admin sẽ cập nhật nội dung tại trang quản trị.
         </p>
-        <div v-else class="space-y-3">
+        <div v-else class="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
           <NuxtLink
             v-for="(a, i) in homeArticles"
             :key="a.id"
