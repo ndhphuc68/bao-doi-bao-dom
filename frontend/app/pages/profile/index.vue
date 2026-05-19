@@ -1,6 +1,10 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['require-auth'] })
-const { t } = useI18n()
+const { t, locale, setLocale } = useI18n()
+
+function toggleLanguage() {
+  setLocale(locale.value === 'vi' ? 'en' : 'vi')
+}
 const localePath = useLocalePath()
 useHead({ title: t('nav.profile') })
 
@@ -183,6 +187,24 @@ function logout() {
           </div>
           <i class="pi pi-angle-right text-slate-400" aria-hidden="true" />
         </NuxtLink>
+
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-slate-50 active:scale-[0.995]"
+          @click="toggleLanguage"
+        >
+          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+            <i class="pi pi-language" aria-hidden="true" />
+          </div>
+          <div class="min-w-0 flex-1 text-left">
+            <p class="text-sm font-bold text-slate-900">{{ locale === 'vi' ? 'Ngôn ngữ' : 'Language' }}</p>
+          </div>
+          <div class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] font-bold shadow-sm">
+            <span :class="locale === 'vi' ? 'text-emerald-600' : 'text-slate-400'">VI</span>
+            <div class="h-2.5 w-px bg-slate-300" />
+            <span :class="locale === 'en' ? 'text-emerald-600' : 'text-slate-400'">EN</span>
+          </div>
+        </button>
       </div>
 
       <button

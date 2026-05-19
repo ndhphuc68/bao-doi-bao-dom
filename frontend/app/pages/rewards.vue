@@ -50,14 +50,6 @@ const hardcodedRewards = computed(() => [
     category: t('common.vietnamese') === 'Tiếng Việt' ? 'Sản phẩm' : 'Product'
   },
   {
-    id: '4',
-    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Mã giảm giá Grab 50k' : 'Grab 50k Discount Code',
-    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Áp dụng cho dịch vụ GrabCar hoặc GrabBike trên toàn quốc.' : 'Applicable to GrabCar or GrabBike services nationwide.',
-    points: 1000,
-    image: '/images/rewards/grab_voucher.png',
-    category: 'Voucher'
-  },
-  {
     id: '5',
     title: t('common.vietnamese') === 'Tiếng Việt' ? 'Sổ tay tái chế' : 'Recycled Notebook',
     description: t('common.vietnamese') === 'Tiếng Việt' ? 'Sổ tay làm từ giấy tái chế 100%, bìa cứng kraft thân thiện.' : 'Notebook made from 100% recycled paper, friendly kraft hard cover.',
@@ -72,6 +64,30 @@ const hardcodedRewards = computed(() => [
     points: 150,
     image: '/images/rewards/straws.png',
     category: t('common.vietnamese') === 'Tiếng Việt' ? 'Sản phẩm' : 'Product'
+  },
+  {
+    id: '7',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Voucher Thế Giới Di Động 4%' : 'The Gioi Di Dong 4% Voucher',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Giảm 4% cho tất cả sản phẩm Điện thoại & Phụ kiện. HSD: 31/12/2026.' : '4% off for all Phone & Accessories. EXP: 31/12/2026.',
+    points: 800,
+    image: '/images/rewards/tgdd.jpg',
+    category: 'Voucher'
+  },
+  {
+    id: '8',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Voucher CellphoneS 500k' : 'CellphoneS 500k Voucher',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Giảm 500.000đ cho đơn hàng từ 10.000.000đ. HSD: 31/12/2026.' : '500,000 VND off for orders from 10,000,000 VND. EXP: 31/12/2026.',
+    points: 1000,
+    image: '/images/rewards/cellphones.jpg',
+    category: 'Voucher'
+  },
+  {
+    id: '9',
+    title: t('common.vietnamese') === 'Tiếng Việt' ? 'Voucher Phi Long 3%' : 'Phi Long 3% Voucher',
+    description: t('common.vietnamese') === 'Tiếng Việt' ? 'Giảm 3% cho tất cả sản phẩm tại Phi Long Technology. HSD: 31/12/2026.' : '3% off for all products at Phi Long Technology. EXP: 31/12/2026.',
+    points: 600,
+    image: '/images/rewards/philong.jpg',
+    category: 'Voucher'
   }
 ])
 
